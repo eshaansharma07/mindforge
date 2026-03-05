@@ -9,73 +9,120 @@
 <body>
   <div class="grid-glow"></div>
   <main class="page">
-    <nav class="nav reveal">
+    <nav class="nav reveal" id="home">
       <div class="brand">
         <img src="/assets/ai-alliance-logo.svg" alt="AI Alliance Logo" />
-        <div>MIND FORGE 2026</div>
+        <span>MIND FORGE</span>
       </div>
       <div class="nav-links">
-        <a class="chip" href="/candidate.html">Candidate Dashboard</a>
-        <a class="chip" href="/admin.html">Admin Controller</a>
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#events">Events</a>
+        <a href="#register">Register</a>
+        <a href="/candidate.html">Portal</a>
+        <a href="#rules">Rules</a>
+        <a href="#contact">Contact</a>
       </div>
     </nav>
 
-    <section class="hero">
-      <article class="card reveal">
-        <span class="badge">ONE-DAY EVENT | 24 March 2026</span>
-        <h1>60 Second Showdown + Rapid Quiz Round</h1>
-        <p class="meta">Organized by AI Alliance and AIT CSE (AIML). Each team gets 60 seconds to answer live challenge questions with minimum response time.</p>
-        <div class="kpis">
-          <div class="kpi"><div class="v">2-3</div><div class="k">Team Size</div></div>
-          <div class="kpi"><div class="v">60s</div><div class="k">Per Question</div></div>
-          <div class="kpi"><div class="v">Live</div><div class="k">Web Updates</div></div>
-        </div>
-      </article>
-      <aside class="card reveal">
-        <h2>Event Flow</h2>
-        <div class="list">
-          <div class="item"><strong>Step 1:</strong> Team Registration</div>
-          <div class="item"><strong>Step 2:</strong> Candidate Dashboard Login</div>
-          <div class="item"><strong>Step 3:</strong> Controller Pushes Questions</div>
-          <div class="item"><strong>Step 4:</strong> Fastest Correct Teams Lead</div>
-        </div>
-      </aside>
+    <section class="hero-main reveal" id="about">
+      <div class="presents">AI ALLIANCE PRESENTS</div>
+      <h1 class="hero-title">MIND FORGE</h1>
+      <p class="hero-sub">One-Day Interdepartmental Technical Competition</p>
+      <p class="hero-tags">AIML · Data Science · Cloud Computing · Blockchain · Full Stack</p>
+
+      <div class="count-row" id="countdownRow">
+        <div class="time-block"><div class="time-num" id="days">00</div><div class="time-label">Days</div></div>
+        <div class="time-block"><div class="time-num" id="hours">00</div><div class="time-label">Hours</div></div>
+        <div class="time-block"><div class="time-num" id="minutes">00</div><div class="time-label">Minutes</div></div>
+        <div class="time-block"><div class="time-num" id="seconds">00</div><div class="time-label">Seconds</div></div>
+      </div>
+
+      <div class="cta-row">
+        <a class="btn primary" href="#register">Register Now</a>
+        <a class="btn" href="#events">View Events</a>
+      </div>
+      <div class="scroll-caret">⌄</div>
     </section>
 
-    <section class="section">
-      <article class="card reveal">
-        <h2>Team Registration</h2>
+    <section class="content" id="events">
+      <header class="section-title reveal">
+        <h2>Event Schedule</h2>
+        <div class="divider"></div>
+        <p>Rapid technical challenge segments designed for speed and precision</p>
+      </header>
+
+      <div class="schedule-track reveal">
+        <article class="event-card left">
+          <span class="day-tag">Day 1</span>
+          <h3>60-Second Showdown</h3>
+          <div class="mode">Quiz Round</div>
+          <p>Fast-paced live question rounds where each team has 60 seconds to submit the correct answer. Faster correct answers rank higher.</p>
+          <div class="tag-wrap">
+            <span>Technical Awareness</span>
+            <span>Quick Thinking</span>
+            <span>Decision Making</span>
+            <span>Conceptual Clarity</span>
+          </div>
+        </article>
+
+        <article class="event-card right">
+          <span class="day-tag">Day 1</span>
+          <h3>Rapid Fire Updates</h3>
+          <div class="mode">Controller Broadcast</div>
+          <p>Admins can push instant updates and controlled question launches directly to all candidate dashboards in real time.</p>
+          <div class="tag-wrap">
+            <span>Live Notices</span>
+            <span>Fair Timing</span>
+            <span>Central Control</span>
+            <span>Team Tracking</span>
+          </div>
+        </article>
+      </div>
+
+      <header class="section-title reveal" id="register">
+        <h2>Register Now</h2>
+        <div class="divider"></div>
+        <p>Form your team of 2-3 members and join the technical showdown on 24 March 2026</p>
+      </header>
+
+      <article class="register-wrap reveal">
         <form id="registrationForm">
           <div class="grid-2">
             <div>
               <label>Team Name *</label>
-              <input class="input" name="teamName" required />
+              <input class="input" name="teamName" placeholder="Enter your team name" required />
             </div>
             <div>
               <label>Department *</label>
-              <input class="input" name="department" required />
+              <input class="input" name="department" placeholder="Select Department" required />
             </div>
           </div>
+
+          <h3>Team Members (2-3 Members)</h3>
+
           <div class="grid-2">
             <div>
-              <label>Leader Name *</label>
-              <input class="input" name="leaderName" required />
+              <label>Team Leader Name *</label>
+              <input class="input" name="leaderName" placeholder="Full name" required />
             </div>
             <div>
-              <label>Leader Email *</label>
-              <input class="input" name="leaderEmail" type="email" required />
+              <label>Team Leader Email *</label>
+              <input class="input" name="leaderEmail" type="email" placeholder="Email address" required />
             </div>
           </div>
+
           <div class="grid-2">
             <div>
-              <label>Leader Phone *</label>
-              <input class="input" name="leaderPhone" required />
+              <label>Team Leader Phone *</label>
+              <input class="input" name="leaderPhone" placeholder="Phone number" required />
             </div>
             <div>
-              <label>Leader Roll *</label>
-              <input class="input" name="leaderRoll" required />
+              <label>Team Leader Roll *</label>
+              <input class="input" name="leaderRoll" placeholder="Roll number" required />
             </div>
           </div>
+
           <div class="grid-2">
             <div>
               <label>Member 2 Name *</label>
@@ -86,6 +133,7 @@
               <input class="input" name="member2Email" type="email" required />
             </div>
           </div>
+
           <div class="grid-2">
             <div>
               <label>Member 2 Roll *</label>
@@ -103,6 +151,7 @@
               </select>
             </div>
           </div>
+
           <div class="grid-2">
             <div>
               <label>Member 3 Name (Optional)</label>
@@ -113,33 +162,46 @@
               <input class="input" name="member3Email" type="email" />
             </div>
           </div>
+
           <div>
             <label>Member 3 Roll (Optional)</label>
             <input class="input" name="member3Roll" />
           </div>
-          <label><input type="checkbox" name="terms" required /> I confirm details are correct and agree to competition rules.</label>
-          <div>
+
+          <label><input type="checkbox" name="terms" required /> I confirm all details are valid and agree to all event rules.</label>
+
+          <div class="cta-row" style="justify-content:flex-start;margin-top:18px;">
             <button class="btn primary" type="submit">Register Team</button>
+            <a class="btn" href="/candidate.html">Open Candidate Portal</a>
           </div>
           <p id="regStatus" class="status"></p>
         </form>
       </article>
 
-      <article class="card reveal">
-        <h2>Instructions</h2>
-        <div class="list">
-          <div class="item">Use the same team ID in candidate dashboard after registration.</div>
-          <div class="item">Controller updates announcements and questions from admin panel.</div>
-          <div class="item">Each question auto-closes after countdown ends.</div>
-          <div class="item">Lowest correct response time wins tie-breaks.</div>
-        </div>
-      </article>
-    </section>
+      <header class="section-title reveal" id="rules">
+        <h2>Rules &amp; Guidelines</h2>
+        <div class="divider"></div>
+        <p>Please read carefully before participating</p>
+      </header>
 
-    <footer class="footer reveal">
-      <div class="muted">Powered by</div>
-      <img src="/assets/unstop-logo.svg" alt="Unstop Logo" />
-    </footer>
+      <div class="rules-grid reveal">
+        <article class="rule"><h4>Time Limits</h4><p>Participants must follow round timings strictly. Late submissions are not accepted.</p></article>
+        <article class="rule"><h4>Fair Play</h4><p>Any unfair means including plagiarism or cheating leads to immediate disqualification.</p></article>
+        <article class="rule"><h4>Judge Decision</h4><p>All judge decisions are final and binding. No appeal accepted.</p></article>
+        <article class="rule"><h4>Device Usage</h4><p>Mobile/internet usage is allowed only if explicitly mentioned in the round instructions.</p></article>
+        <article class="rule"><h4>Team Size</h4><p>Each team must have 2-3 members. All members should belong to the same institution.</p></article>
+        <article class="rule"><h4>Judging Criteria</h4><p>Accuracy, speed, innovation, team coordination, and strategic thinking.</p></article>
+      </div>
+
+      <footer class="footer reveal" id="contact">
+        <div>
+          <div class="muted">Organized by AI Alliance &amp; AIT CSE (AIML)</div>
+          <div class="muted">Event Date: 24 March 2026</div>
+          <div class="muted">Admin Controller: <a href="/admin.html" style="color:var(--cyan);text-decoration:none;">Open Dashboard</a></div>
+        </div>
+        <img src="/assets/unstop-logo.svg" alt="Unstop Logo" />
+      </footer>
+    </section>
   </main>
 
   <script src="/scripts/index.js"></script>
