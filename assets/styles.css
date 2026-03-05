@@ -219,6 +219,12 @@ body::before {
   background: linear-gradient(90deg, #37dbff, #8d77ff);
 }
 
+.content .btn {
+  min-width: 180px;
+  font-size: 0.98rem;
+  padding: 12px 16px;
+}
+
 .scroll-caret {
   margin-top: 18px;
   color: var(--cyan);

@@ -12,87 +12,108 @@
     <nav class="nav reveal">
       <div class="brand">
         <img src="/assets/ai-alliance-logo.svg" alt="AI Alliance Logo" />
-        <div>Admin / Controller Panel</div>
+        <span>MIND FORGE</span>
       </div>
       <div class="nav-links">
-        <a class="chip" href="/index.html">Back to Home</a>
+        <a href="/index.html">Home</a>
+        <a href="/index.html#events">Events</a>
+        <a href="/candidate.html">Portal</a>
+        <a href="/admin.html">Controller</a>
       </div>
     </nav>
 
-    <section class="section">
-      <article class="card reveal">
-        <h2>Controller Login</h2>
-        <form id="adminLoginForm">
-          <label>Controller Key</label>
-          <input class="input" name="key" type="password" required />
-          <button class="btn primary" type="submit">Unlock Panel</button>
-          <p id="adminStatus" class="status"></p>
-        </form>
-      </article>
+    <section class="content">
+      <header class="section-title reveal">
+        <h2>Controller Dashboard</h2>
+        <div class="divider"></div>
+        <p>Manage registrations, push announcements, and control live 60-second quiz rounds</p>
+      </header>
 
-      <article class="card reveal">
-        <h2>Overview</h2>
-        <div class="kpis">
-          <div class="kpi"><div id="teamsCount" class="v">0</div><div class="k">Registered Teams</div></div>
-          <div class="kpi"><div id="activeQuestion" class="v">No</div><div class="k">Question Active</div></div>
-          <div class="kpi"><div id="leaderboardCount" class="v">0</div><div class="k">Fast Correct</div></div>
-        </div>
-      </article>
-    </section>
+      <section class="section reveal">
+        <article class="register-wrap">
+          <h3>Controller Login</h3>
+          <form id="adminLoginForm">
+            <label>Controller Key</label>
+            <input class="input" name="key" type="password" required />
+            <button class="btn primary" type="submit">Unlock Panel</button>
+            <p id="adminStatus" class="status"></p>
+          </form>
+        </article>
 
-    <section class="section">
-      <article class="card reveal">
-        <h2>Publish Update</h2>
-        <form id="announcementForm">
-          <label>Title</label>
-          <input class="input" name="title" required />
-          <label>Message</label>
-          <textarea name="body" required></textarea>
-          <label>Type</label>
-          <select name="type">
-            <option value="info">Info</option>
-            <option value="alert">Alert</option>
-            <option value="result">Result</option>
-          </select>
-          <button class="btn" type="submit">Push Announcement</button>
-        </form>
-      </article>
-
-      <article class="card reveal">
-        <h2>Launch Question</h2>
-        <form id="questionForm">
-          <label>Question</label>
-          <textarea name="text" required></textarea>
-          <label>Options (one per line)</label>
-          <textarea name="options" placeholder="Option 1&#10;Option 2&#10;Option 3" required></textarea>
-          <label>Correct Option Index (0-based)</label>
-          <input class="input" type="number" min="0" name="correctIndex" required />
-          <label>Duration (seconds)</label>
-          <input class="input" type="number" min="15" value="60" name="durationSec" required />
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn primary" type="submit">Launch Now</button>
-            <button class="btn" id="closeQuestionBtn" type="button">Close Active Question</button>
+        <article class="card">
+          <h3>Overview</h3>
+          <div class="count-row" style="gap:22px;justify-content:flex-start;">
+            <div class="time-block"><div id="teamsCount" class="time-num" style="font-size:2.2rem;">0</div><div class="time-label">Teams</div></div>
+            <div class="time-block"><div id="activeQuestion" class="time-num" style="font-size:2.2rem;">No</div><div class="time-label">Active</div></div>
+            <div class="time-block"><div id="leaderboardCount" class="time-num" style="font-size:2.2rem;">0</div><div class="time-label">Fast Correct</div></div>
           </div>
-        </form>
-      </article>
+        </article>
+      </section>
+
+      <section class="section reveal">
+        <article class="card">
+          <h3>Publish Update</h3>
+          <form id="announcementForm">
+            <label>Title</label>
+            <input class="input" name="title" required />
+
+            <label>Message</label>
+            <textarea name="body" required></textarea>
+
+            <label>Type</label>
+            <select name="type">
+              <option value="info">Info</option>
+              <option value="alert">Alert</option>
+              <option value="result">Result</option>
+            </select>
+
+            <button class="btn" type="submit">Push Announcement</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <h3>Launch Question</h3>
+          <form id="questionForm">
+            <label>Question</label>
+            <textarea name="text" required></textarea>
+
+            <label>Options (One Per Line)</label>
+            <textarea name="options" placeholder="Option 1&#10;Option 2&#10;Option 3" required></textarea>
+
+            <label>Correct Option Index (0-Based)</label>
+            <input class="input" type="number" min="0" name="correctIndex" required />
+
+            <label>Duration (Seconds)</label>
+            <input class="input" type="number" min="15" value="60" name="durationSec" required />
+
+            <div class="cta-row" style="justify-content:flex-start;margin-top:10px;">
+              <button class="btn primary" type="submit">Launch Now</button>
+              <button class="btn" id="closeQuestionBtn" type="button">Close Active Question</button>
+            </div>
+          </form>
+        </article>
+      </section>
+
+      <section class="section reveal">
+        <article class="card">
+          <h3>Latest Teams</h3>
+          <div id="teamsBox" class="list"></div>
+        </article>
+
+        <article class="card">
+          <h3>Live Leaderboard</h3>
+          <div id="leaderboardBox" class="list"></div>
+        </article>
+      </section>
+
+      <footer class="footer reveal">
+        <div>
+          <div class="muted">Admin Controller | Mind Forge 2026</div>
+          <div class="muted">Only authorized event controllers should access this panel</div>
+        </div>
+        <img src="/assets/unstop-logo.svg" alt="Unstop Logo" />
+      </footer>
     </section>
-
-    <section class="section">
-      <article class="card reveal">
-        <h2>Latest Teams</h2>
-        <div id="teamsBox" class="list"></div>
-      </article>
-
-      <article class="card reveal">
-        <h2>Live Leaderboard</h2>
-        <div id="leaderboardBox" class="list"></div>
-      </article>
-    </section>
-
-    <footer class="footer reveal">
-      <div class="muted">Powered by</div>
-      <img src="/assets/unstop-logo.svg" alt="Unstop Logo" />
-    </footer>
   </main>
 
   <script src="/scripts/admin.js"></script>

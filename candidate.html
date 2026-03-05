@@ -12,56 +12,73 @@
     <nav class="nav reveal">
       <div class="brand">
         <img src="/assets/ai-alliance-logo.svg" alt="AI Alliance Logo" />
-        <div>Candidate Dashboard</div>
+        <span>MIND FORGE</span>
       </div>
       <div class="nav-links">
-        <a class="chip" href="/index.html">Back to Home</a>
+        <a href="/index.html">Home</a>
+        <a href="/index.html#events">Events</a>
+        <a href="/index.html#rules">Rules</a>
+        <a href="/candidate.html">Portal</a>
+        <a href="/admin.html">Controller</a>
       </div>
     </nav>
 
-    <section class="section">
-      <article class="card reveal">
-        <h2>Team Login</h2>
-        <form id="candidateLoginForm">
-          <label>Team ID *</label>
-          <input class="input" name="teamId" placeholder="MF-XXXXXXXX" required />
-          <label>Registered Email *</label>
-          <input class="input" name="email" type="email" required />
-          <button class="btn primary" type="submit">Open Dashboard</button>
-          <p id="loginStatus" class="status"></p>
-        </form>
-      </article>
+    <section class="content">
+      <header class="section-title reveal">
+        <h2>Candidate Portal</h2>
+        <div class="divider"></div>
+        <p>Login with Team ID and registered email to receive live questions and updates</p>
+      </header>
 
-      <article class="card reveal">
-        <h2>Live Rapid Round</h2>
-        <p class="muted">When controller launches a question, it appears here instantly. You get 60 seconds.</p>
-        <div class="countdown" id="countdown">--</div>
-      </article>
+      <section class="section reveal">
+        <article class="register-wrap">
+          <h3>Team Login</h3>
+          <form id="candidateLoginForm">
+            <label>Team ID *</label>
+            <input class="input" name="teamId" placeholder="MF-XXXXXXXX" required />
+
+            <label>Registered Email *</label>
+            <input class="input" name="email" type="email" required />
+
+            <button class="btn primary" type="submit">Open Dashboard</button>
+            <p id="loginStatus" class="status"></p>
+          </form>
+        </article>
+
+        <article class="card">
+          <h3>Live Rapid Round</h3>
+          <p class="muted">As soon as the controller launches a question, your timer starts. Submit quickly and accurately.</p>
+          <div class="countdown" id="countdown">--</div>
+        </article>
+      </section>
+
+      <section class="section reveal">
+        <article class="card">
+          <h3>Team Details</h3>
+          <div id="teamBox" class="list"></div>
+        </article>
+
+        <article class="card">
+          <h3>Announcements</h3>
+          <div id="announcementBox" class="list"></div>
+        </article>
+      </section>
+
+      <section class="card reveal">
+        <h3>Current Question</h3>
+        <div id="questionText" class="item muted">No active question yet.</div>
+        <div id="optionsBox" class="options"></div>
+        <p id="answerStatus" class="status"></p>
+      </section>
+
+      <footer class="footer reveal">
+        <div>
+          <div class="muted">Candidate Dashboard | Mind Forge 2026</div>
+          <div class="muted">Powered by Unstop</div>
+        </div>
+        <img src="/assets/unstop-logo.svg" alt="Unstop Logo" />
+      </footer>
     </section>
-
-    <section class="section">
-      <article class="card reveal">
-        <h2>Team Details</h2>
-        <div id="teamBox" class="list"></div>
-      </article>
-
-      <article class="card reveal">
-        <h2>Announcements</h2>
-        <div id="announcementBox" class="list"></div>
-      </article>
-    </section>
-
-    <section class="card reveal">
-      <h2>Current Question</h2>
-      <div id="questionText" class="item muted">No active question yet.</div>
-      <div id="optionsBox" class="options"></div>
-      <p id="answerStatus" class="status"></p>
-    </section>
-
-    <footer class="footer reveal">
-      <div class="muted">Powered by</div>
-      <img src="/assets/unstop-logo.svg" alt="Unstop Logo" />
-    </footer>
   </main>
 
   <script src="/scripts/candidate.js"></script>
