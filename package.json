@@ -1,0 +1,21 @@
+{
+  "name": "mind-forge-2026",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mind Forge 2026 event platform with candidate and admin dashboards",
+  "scripts": {
+    "dev": "node scripts/local-dev.js",
+    "start": "node scripts/local-dev.js",
+    "vercel-dev": "vercel dev"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "mongodb": "^6.15.0"
+  },
+  "devDependencies": {
+    "vercel": "^39.4.0"
+  }
+}

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Controller | Mind Forge 2026</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <div class="grid-glow"></div>
+  <main class="page">
+    <nav class="nav reveal">
+      <div class="brand">
+        <img src="/assets/ai-alliance-logo.svg" alt="AI Alliance Logo" />
+        <div>Admin / Controller Panel</div>
+      </div>
+      <div class="nav-links">
+        <a class="chip" href="/index.html">Back to Home</a>
+      </div>
+    </nav>
+
+    <section class="section">
+      <article class="card reveal">
+        <h2>Controller Login</h2>
+        <form id="adminLoginForm">
+          <label>Controller Key</label>
+          <input class="input" name="key" type="password" required />
+          <button class="btn primary" type="submit">Unlock Panel</button>
+          <p id="adminStatus" class="status"></p>
+        </form>
+      </article>
+
+      <article class="card reveal">
+        <h2>Overview</h2>
+        <div class="kpis">
+          <div class="kpi"><div id="teamsCount" class="v">0</div><div class="k">Registered Teams</div></div>
+          <div class="kpi"><div id="activeQuestion" class="v">No</div><div class="k">Question Active</div></div>
+          <div class="kpi"><div id="leaderboardCount" class="v">0</div><div class="k">Fast Correct</div></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="section">
+      <article class="card reveal">
+        <h2>Publish Update</h2>
+        <form id="announcementForm">
+          <label>Title</label>
+          <input class="input" name="title" required />
+          <label>Message</label>
+          <textarea name="body" required></textarea>
+          <label>Type</label>
+          <select name="type">
+            <option value="info">Info</option>
+            <option value="alert">Alert</option>
+            <option value="result">Result</option>
+          </select>
+          <button class="btn" type="submit">Push Announcement</button>
+        </form>
+      </article>
+
+      <article class="card reveal">
+        <h2>Launch Question</h2>
+        <form id="questionForm">
+          <label>Question</label>
+          <textarea name="text" required></textarea>
+          <label>Options (one per line)</label>
+          <textarea name="options" placeholder="Option 1&#10;Option 2&#10;Option 3" required></textarea>
+          <label>Correct Option Index (0-based)</label>
+          <input class="input" type="number" min="0" name="correctIndex" required />
+          <label>Duration (seconds)</label>
+          <input class="input" type="number" min="15" value="60" name="durationSec" required />
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn primary" type="submit">Launch Now</button>
+            <button class="btn" id="closeQuestionBtn" type="button">Close Active Question</button>
+          </div>
+        </form>
+      </article>
+    </section>
+
+    <section class="section">
+      <article class="card reveal">
+        <h2>Latest Teams</h2>
+        <div id="teamsBox" class="list"></div>
+      </article>
+
+      <article class="card reveal">
+        <h2>Live Leaderboard</h2>
+        <div id="leaderboardBox" class="list"></div>
+      </article>
+    </section>
+
+    <footer class="footer reveal">
+      <div class="muted">Powered by</div>
+      <img src="/assets/unstop-logo.svg" alt="Unstop Logo" />
+    </footer>
+  </main>
+
+  <script src="/scripts/admin.js"></script>
+</body>
+</html>

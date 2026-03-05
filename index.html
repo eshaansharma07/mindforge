@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MIND FORGE 2026 | AI Alliance</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <div class="grid-glow"></div>
+  <main class="page">
+    <nav class="nav reveal">
+      <div class="brand">
+        <img src="/assets/ai-alliance-logo.svg" alt="AI Alliance Logo" />
+        <div>MIND FORGE 2026</div>
+      </div>
+      <div class="nav-links">
+        <a class="chip" href="/candidate.html">Candidate Dashboard</a>
+        <a class="chip" href="/admin.html">Admin Controller</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <article class="card reveal">
+        <span class="badge">ONE-DAY EVENT | 24 March 2026</span>
+        <h1>60 Second Showdown + Rapid Quiz Round</h1>
+        <p class="meta">Organized by AI Alliance and AIT CSE (AIML). Each team gets 60 seconds to answer live challenge questions with minimum response time.</p>
+        <div class="kpis">
+          <div class="kpi"><div class="v">2-3</div><div class="k">Team Size</div></div>
+          <div class="kpi"><div class="v">60s</div><div class="k">Per Question</div></div>
+          <div class="kpi"><div class="v">Live</div><div class="k">Web Updates</div></div>
+        </div>
+      </article>
+      <aside class="card reveal">
+        <h2>Event Flow</h2>
+        <div class="list">
+          <div class="item"><strong>Step 1:</strong> Team Registration</div>
+          <div class="item"><strong>Step 2:</strong> Candidate Dashboard Login</div>
+          <div class="item"><strong>Step 3:</strong> Controller Pushes Questions</div>
+          <div class="item"><strong>Step 4:</strong> Fastest Correct Teams Lead</div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section">
+      <article class="card reveal">
+        <h2>Team Registration</h2>
+        <form id="registrationForm">
+          <div class="grid-2">
+            <div>
+              <label>Team Name *</label>
+              <input class="input" name="teamName" required />
+            </div>
+            <div>
+              <label>Department *</label>
+              <input class="input" name="department" required />
+            </div>
+          </div>
+          <div class="grid-2">
+            <div>
+              <label>Leader Name *</label>
+              <input class="input" name="leaderName" required />
+            </div>
+            <div>
+              <label>Leader Email *</label>
+              <input class="input" name="leaderEmail" type="email" required />
+            </div>
+          </div>
+          <div class="grid-2">
+            <div>
+              <label>Leader Phone *</label>
+              <input class="input" name="leaderPhone" required />
+            </div>
+            <div>
+              <label>Leader Roll *</label>
+              <input class="input" name="leaderRoll" required />
+            </div>
+          </div>
+          <div class="grid-2">
+            <div>
+              <label>Member 2 Name *</label>
+              <input class="input" name="member2Name" required />
+            </div>
+            <div>
+              <label>Member 2 Email *</label>
+              <input class="input" name="member2Email" type="email" required />
+            </div>
+          </div>
+          <div class="grid-2">
+            <div>
+              <label>Member 2 Roll *</label>
+              <input class="input" name="member2Roll" required />
+            </div>
+            <div>
+              <label>Preferred Domain</label>
+              <select name="domain">
+                <option value="">Select one</option>
+                <option>AIML</option>
+                <option>Data Science</option>
+                <option>Cloud</option>
+                <option>Cybersecurity</option>
+                <option>Full Stack</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div>
+              <label>Member 3 Name (Optional)</label>
+              <input class="input" name="member3Name" />
+            </div>
+            <div>
+              <label>Member 3 Email (Optional)</label>
+              <input class="input" name="member3Email" type="email" />
+            </div>
+          </div>
+          <div>
+            <label>Member 3 Roll (Optional)</label>
+            <input class="input" name="member3Roll" />
+          </div>
+          <label><input type="checkbox" name="terms" required /> I confirm details are correct and agree to competition rules.</label>
+          <div>
+            <button class="btn primary" type="submit">Register Team</button>
+          </div>
+          <p id="regStatus" class="status"></p>
+        </form>
+      </article>
+
+      <article class="card reveal">
+        <h2>Instructions</h2>
+        <div class="list">
+          <div class="item">Use the same team ID in candidate dashboard after registration.</div>
+          <div class="item">Controller updates announcements and questions from admin panel.</div>
+          <div class="item">Each question auto-closes after countdown ends.</div>
+          <div class="item">Lowest correct response time wins tie-breaks.</div>
+        </div>
+      </article>
+    </section>
+
+    <footer class="footer reveal">
+      <div class="muted">Powered by</div>
+      <img src="/assets/unstop-logo.svg" alt="Unstop Logo" />
+    </footer>
+  </main>
+
+  <script src="/scripts/index.js"></script>
+</body>
+</html>
