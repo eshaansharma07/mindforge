@@ -6,9 +6,11 @@ const questionText = document.getElementById("questionText");
 const optionsBox = document.getElementById("optionsBox");
 const answerStatus = document.getElementById("answerStatus");
 const countdownEl = document.getElementById("countdown");
+const submitSetBtn = document.getElementById("submitSetBtn");
 
 let activeTeamId = localStorage.getItem("mindforge_team_id") || "";
-let currentQuestionId = null;
+let activeSetId = null;
+let selectedAnswers = {};
 let timer;
 
 function setStatus(el, msg, type = "") {
@@ -40,15 +42,69 @@ function startCountdown(endAt) {
     if (left <= 0) {
       clearInterval(timer);
       countdownEl.textContent = "0s";
+      submitSetBtn.style.display = "none";
     }
   };
 
   tick();
-  timer = setInterval(tick, 500);
+  timer = setInterval(tick, 400);
 }
 
-async function submitAnswer(selectedIndex) {
-  if (!activeTeamId || !currentQuestionId) return;
+function renderQuestionSet(set) {
+  optionsBox.innerHTML = "";
+  selectedAnswers = {};
+
+  (set.questions || []).forEach((q, index) => {
+    const wrap = document.createElement("div");
+    wrap.className = "item";
+
+    const title = document.createElement("div");
+    title.innerHTML = `<strong>Q${index + 1}.</strong> ${q.text}`;
+    title.style.marginBottom = "10px";
+    wrap.appendChild(title);
+
+    const choices = document.createElement("div");
+    choices.className = "options";
+
+    q.options.forEach((option, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "opt";
+      btn.textContent = `${String.fromCharCode(65 + idx)}. ${option}`;
+
+      btn.addEventListener("click", () => {
+        selectedAnswers[q.questionId] = idx;
+
+        const siblings = choices.querySelectorAll("button");
+        siblings.forEach((s) => {
+          s.style.borderColor = "rgba(63, 126, 188, 0.55)";
+          s.style.boxShadow = "none";
+        });
+
+        btn.style.borderColor = "rgba(37, 232, 255, 0.88)";
+        btn.style.boxShadow = "0 0 14px rgba(40, 228, 255, 0.22)";
+      });
+
+      choices.appendChild(btn);
+    });
+
+    wrap.appendChild(choices);
+    optionsBox.appendChild(wrap);
+  });
+}
+
+async function submitAllAnswers() {
+  if (!activeTeamId || !activeSetId) return;
+
+  const answers = Object.entries(selectedAnswers).map(([questionId, selectedIndex]) => ({
+    questionId,
+    selectedIndex
+  }));
+
+  if (answers.length === 0) {
+    setStatus(answerStatus, "Select at least one answer before submitting.", "err");
+    return;
+  }
 
   try {
     const response = await fetch("/api/submit-answer", {
@@ -56,8 +112,8 @@ async function submitAnswer(selectedIndex) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         teamId: activeTeamId,
-        questionId: currentQuestionId,
-        selectedIndex
+        setId: activeSetId,
+        answers
       })
     });
 
@@ -66,9 +122,13 @@ async function submitAnswer(selectedIndex) {
       throw new Error(result.message || "Submission failed.");
     }
 
-    const tag = result.isCorrect ? "Correct" : "Submitted";
-    setStatus(answerStatus, `${tag}. Response time: ${Math.round(result.elapsedMs / 1000)}s`, "ok");
-    optionsBox.innerHTML = "";
+    setStatus(
+      answerStatus,
+      `Submitted. Correct: ${result.correctCount}/${result.totalQuestions} | Points: ${result.points} | Time: ${Math.round(result.elapsedMs / 1000)}s`,
+      "ok"
+    );
+
+    submitSetBtn.style.display = "none";
     await loadState();
   } catch (error) {
     setStatus(answerStatus, error.message || "Could not submit.", "err");
@@ -103,40 +163,43 @@ async function loadState() {
       "No announcements yet"
     );
 
-    const q = result.currentQuestion;
-    if (!q) {
-      currentQuestionId = null;
-      questionText.textContent = "No active question yet.";
+    const set = result.activeSet;
+    if (!set) {
+      activeSetId = null;
+      questionText.textContent = "No active question set yet.";
       questionText.className = "item muted";
       optionsBox.innerHTML = "";
       countdownEl.textContent = "--";
+      submitSetBtn.style.display = "none";
       return;
     }
 
-    currentQuestionId = q.questionId;
-    questionText.textContent = q.text;
+    activeSetId = set.setId;
+    questionText.innerHTML = `<strong>Set ${set.setId}</strong> | ${set.questions.length} questions | ${set.durationSec}s total`;
     questionText.className = "item";
-    startCountdown(q.endAt);
+    startCountdown(set.endAt);
 
-    if (result.hasAnswered) {
+    if (result.hasSubmitted) {
       optionsBox.innerHTML = "";
-      setStatus(answerStatus, "Answer already submitted for this question.", "ok");
+      submitSetBtn.style.display = "none";
+      const s = result.submission;
+      setStatus(
+        answerStatus,
+        `Already submitted. Correct: ${s.correctCount}/${s.totalQuestions} | Points: ${s.points} | Time: ${Math.round(s.elapsedMs / 1000)}s`,
+        "ok"
+      );
       return;
     }
 
-    optionsBox.innerHTML = "";
-    q.options.forEach((option, idx) => {
-      const btn = document.createElement("button");
-      btn.className = "opt";
-      btn.type = "button";
-      btn.textContent = `${String.fromCharCode(65 + idx)}. ${option}`;
-      btn.addEventListener("click", () => submitAnswer(idx));
-      optionsBox.appendChild(btn);
-    });
+    renderQuestionSet(set);
+    submitSetBtn.style.display = "inline-block";
+    setStatus(answerStatus, "Select answers for all questions and click Submit All Answers.", "");
   } catch (error) {
     setStatus(loginStatus, error.message || "Failed to load state.", "err");
   }
 }
+
+submitSetBtn?.addEventListener("click", submitAllAnswers);
 
 loginForm?.addEventListener("submit", async (event) => {
   event.preventDefault();

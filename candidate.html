@@ -27,7 +27,7 @@
       <header class="section-title reveal">
         <h2>Candidate Portal</h2>
         <div class="divider"></div>
-        <p>Login with Team ID and registered email to receive live questions and updates</p>
+        <p>One question set contains multiple questions. You get 60 seconds total to submit all answers.</p>
       </header>
 
       <section class="section reveal">
@@ -46,8 +46,8 @@
         </article>
 
         <article class="card">
-          <h3>Live Rapid Round</h3>
-          <p class="muted">As soon as the controller launches a question, your timer starts. Submit quickly and accurately.</p>
+          <h3>Live Round Timer</h3>
+          <p class="muted">Submit answers for all displayed questions before timer ends.</p>
           <div class="countdown" id="countdown">--</div>
         </article>
       </section>
@@ -65,9 +65,12 @@
       </section>
 
       <section class="card reveal">
-        <h3>Current Question</h3>
-        <div id="questionText" class="item muted">No active question yet.</div>
+        <h3>Current Question Set</h3>
+        <div id="questionText" class="item muted">No active question set yet.</div>
         <div id="optionsBox" class="options"></div>
+        <div class="cta-row" style="justify-content:flex-start;margin-top:12px;">
+          <button class="btn primary" id="submitSetBtn" type="button" style="display:none;">Submit All Answers</button>
+        </div>
         <p id="answerStatus" class="status"></p>
       </section>
 

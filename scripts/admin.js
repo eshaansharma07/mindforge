@@ -8,6 +8,7 @@ const activeQuestion = document.getElementById("activeQuestion");
 const leaderboardCount = document.getElementById("leaderboardCount");
 const teamsBox = document.getElementById("teamsBox");
 const leaderboardBox = document.getElementById("leaderboardBox");
+const responsesBox = document.getElementById("responsesBox");
 
 let adminKey = sessionStorage.getItem("mindforge_admin_key") || "";
 
@@ -56,13 +57,37 @@ function renderRows(container, rows, empty = "No data") {
   });
 }
 
+function parseBatchQuestions(text) {
+  const lines = String(text || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const questions = [];
+
+  for (const line of lines) {
+    const parts = line.split("||").map((p) => p.trim()).filter(Boolean);
+    if (parts.length < 4) continue;
+
+    const correctIndex = Number(parts[parts.length - 1]);
+    const text = parts[0];
+    const options = parts.slice(1, -1);
+
+    if (!text || options.length < 2 || !Number.isInteger(correctIndex)) continue;
+
+    questions.push({ text, options, correctIndex });
+  }
+
+  return questions;
+}
+
 async function refreshOverview() {
   if (!adminKey) return;
 
   try {
     const data = await api("/api/admin-overview");
     teamsCount.textContent = String(data.teamsCount);
-    activeQuestion.textContent = data.activeQuestion ? "Yes" : "No";
+    activeQuestion.textContent = data.activeSet ? "Yes" : "No";
     leaderboardCount.textContent = String(data.leaderboard.length);
 
     renderRows(
@@ -73,8 +98,26 @@ async function refreshOverview() {
 
     renderRows(
       leaderboardBox,
-      data.leaderboard.map((l, i) => `#${i + 1} <strong>${l.teamName || l.teamId}</strong> - ${Math.round(l.elapsedMs / 1000)}s`),
-      "No correct submissions yet"
+      data.leaderboard.map(
+        (l, i) =>
+          `#${i + 1} <strong>${l.teamName || l.teamId}</strong> | Points: ${l.points} | Correct: ${l.correctCount}/${l.totalQuestions} | Time: ${Math.round(l.elapsedMs / 1000)}s`
+      ),
+      "No submissions yet"
+    );
+
+    renderRows(
+      responsesBox,
+      data.responseBreakdown.map((r) => {
+        const answers = (r.answers || [])
+          .map(
+            (a, idx) =>
+              `Q${idx + 1}: selected ${a.selectedIndex >= 0 ? a.selectedIndex : "-"}, correct ${a.correctIndex} -> <strong style=\"color:${a.isCorrect ? "#73ffa4" : "#ff7595"}\">${a.isCorrect ? "Correct" : "Wrong"}</strong>`
+          )
+          .join("<br/>");
+
+        return `<strong>${r.teamName || r.teamId}</strong> (${r.teamId})<br/>Points: ${r.points} | Correct: ${r.correctCount}/${r.totalQuestions} | Time: ${Math.round(r.elapsedMs / 1000)}s<br/><span class="muted">${answers}</span>`;
+      }),
+      "No team submissions yet"
     );
   } catch (error) {
     status(error.message || "Unable to refresh overview", "err");
@@ -128,18 +171,24 @@ questionForm?.addEventListener("submit", async (event) => {
   if (lockRequired()) return;
 
   const raw = Object.fromEntries(new FormData(questionForm).entries());
+  const questions = parseBatchQuestions(raw.batchQuestions);
+
+  if (questions.length === 0) {
+    status("Add valid question lines in the required format.", "err");
+    return;
+  }
+
   const payload = {
-    text: raw.text,
-    options: String(raw.options || "").split("\n").map((x) => x.trim()).filter(Boolean),
-    correctIndex: Number(raw.correctIndex),
-    durationSec: Number(raw.durationSec)
+    questions,
+    durationSec: Number(raw.durationSec),
+    pointsPerCorrect: Number(raw.pointsPerCorrect)
   };
 
-  status("Launching live question...");
+  status("Launching question set...");
 
   try {
-    await api("/api/admin-launch-question", "POST", payload);
-    status("Question launched successfully.", "ok");
+    const result = await api("/api/admin-launch-question", "POST", payload);
+    status(`Question set launched. Set ID: ${result.setId} (${result.questionCount} questions)`, "ok");
     questionForm.reset();
     refreshOverview();
   } catch (error) {
@@ -149,14 +198,14 @@ questionForm?.addEventListener("submit", async (event) => {
 
 closeQuestionBtn?.addEventListener("click", async () => {
   if (lockRequired()) return;
-  status("Closing active question...");
+  status("Closing active set...");
 
   try {
     await api("/api/admin-close-question", "POST");
-    status("Question closed.", "ok");
+    status("Question set closed.", "ok");
     refreshOverview();
   } catch (error) {
-    status(error.message || "Could not close question.", "err");
+    status(error.message || "Could not close set.", "err");
   }
 });
 

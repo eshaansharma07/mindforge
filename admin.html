@@ -26,7 +26,7 @@
       <header class="section-title reveal">
         <h2>Controller Dashboard</h2>
         <div class="divider"></div>
-        <p>Manage registrations, push announcements, and control live 60-second quiz rounds</p>
+        <p>Launch multiple questions as one 60-second set and evaluate each team by correctness and points.</p>
       </header>
 
       <section class="section reveal">
@@ -44,8 +44,8 @@
           <h3>Overview</h3>
           <div class="count-row" style="gap:22px;justify-content:flex-start;">
             <div class="time-block"><div id="teamsCount" class="time-num" style="font-size:2.2rem;">0</div><div class="time-label">Teams</div></div>
-            <div class="time-block"><div id="activeQuestion" class="time-num" style="font-size:2.2rem;">No</div><div class="time-label">Active</div></div>
-            <div class="time-block"><div id="leaderboardCount" class="time-num" style="font-size:2.2rem;">0</div><div class="time-label">Fast Correct</div></div>
+            <div class="time-block"><div id="activeQuestion" class="time-num" style="font-size:2.2rem;">No</div><div class="time-label">Set Active</div></div>
+            <div class="time-block"><div id="leaderboardCount" class="time-num" style="font-size:2.2rem;">0</div><div class="time-label">Submissions</div></div>
           </div>
         </article>
       </section>
@@ -72,23 +72,21 @@
         </article>
 
         <article class="card">
-          <h3>Launch Question</h3>
+          <h3>Launch Question Set</h3>
           <form id="questionForm">
-            <label>Question</label>
-            <textarea name="text" required></textarea>
-
-            <label>Options (One Per Line)</label>
-            <textarea name="options" placeholder="Option 1&#10;Option 2&#10;Option 3" required></textarea>
-
-            <label>Correct Option Index (0-Based)</label>
-            <input class="input" type="number" min="0" name="correctIndex" required />
+            <label>Questions (One per line)</label>
+            <textarea name="batchQuestions" placeholder="Question text || Option A || Option B || Option C || 0"></textarea>
+            <p class="muted">Format per line: Question || Option1 || Option2 || ... || CorrectOptionIndex(0-based)</p>
 
             <label>Duration (Seconds)</label>
             <input class="input" type="number" min="15" value="60" name="durationSec" required />
 
+            <label>Points per Correct Answer</label>
+            <input class="input" type="number" min="1" value="10" name="pointsPerCorrect" required />
+
             <div class="cta-row" style="justify-content:flex-start;margin-top:10px;">
-              <button class="btn primary" type="submit">Launch Now</button>
-              <button class="btn" id="closeQuestionBtn" type="button">Close Active Question</button>
+              <button class="btn primary" type="submit">Launch Set</button>
+              <button class="btn" id="closeQuestionBtn" type="button">Close Active Set</button>
             </div>
           </form>
         </article>
@@ -101,9 +99,14 @@
         </article>
 
         <article class="card">
-          <h3>Live Leaderboard</h3>
+          <h3>Leaderboard (Points)</h3>
           <div id="leaderboardBox" class="list"></div>
         </article>
+      </section>
+
+      <section class="card reveal">
+        <h3>Team Answer Review (Correct/Incorrect)</h3>
+        <div id="responsesBox" class="list"></div>
       </section>
 
       <footer class="footer reveal">

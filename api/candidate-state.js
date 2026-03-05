@@ -39,26 +39,48 @@ module.exports = async (req, res) => {
       .limit(8)
       .toArray();
 
-    const currentQuestion = await db.collection("quiz_questions").findOne(
-      { isActive: true },
-      { projection: { _id: 0, questionId: 1, text: 1, options: 1, startAt: 1, endAt: 1, isActive: 1 } }
-    );
+    const activeSetRaw = await db.collection("quiz_sets").findOne({ isActive: true });
+    const activeSet = activeSetRaw
+      ? {
+          setId: activeSetRaw.setId,
+          startAt: activeSetRaw.startAt,
+          endAt: activeSetRaw.endAt,
+          durationSec: activeSetRaw.durationSec,
+          pointsPerCorrect: activeSetRaw.pointsPerCorrect,
+          questions: (activeSetRaw.questions || []).map((q) => ({
+            questionId: q.questionId,
+            text: q.text,
+            options: q.options
+          }))
+        }
+      : null;
 
-    let hasAnswered = false;
-    if (currentQuestion) {
+    let hasSubmitted = false;
+    let submission = null;
+    if (activeSet) {
       const existing = await db.collection("quiz_responses").findOne({
-        questionId: currentQuestion.questionId,
+        setId: activeSet.setId,
         teamId
       });
-      hasAnswered = Boolean(existing);
+
+      if (existing) {
+        hasSubmitted = true;
+        submission = {
+          correctCount: existing.correctCount,
+          points: existing.points,
+          totalQuestions: existing.totalQuestions,
+          elapsedMs: existing.elapsedMs
+        };
+      }
     }
 
     return send(res, 200, {
       success: true,
       team,
       announcements,
-      currentQuestion,
-      hasAnswered,
+      activeSet,
+      hasSubmitted,
+      submission,
       now: new Date().toISOString()
     });
   } catch (error) {
