@@ -11,6 +11,7 @@ const submitSetBtn = document.getElementById("submitSetBtn");
 let activeTeamId = localStorage.getItem("mindforge_team_id") || "";
 let activeSetId = null;
 let selectedAnswers = {};
+let renderedSetId = null;
 let timer;
 
 function setStatus(el, msg, type = "") {
@@ -52,7 +53,6 @@ function startCountdown(endAt) {
 
 function renderQuestionSet(set) {
   optionsBox.innerHTML = "";
-  selectedAnswers = {};
 
   (set.questions || []).forEach((q, index) => {
     const wrap = document.createElement("div");
@@ -84,6 +84,11 @@ function renderQuestionSet(set) {
         btn.style.borderColor = "rgba(37, 232, 255, 0.88)";
         btn.style.boxShadow = "0 0 14px rgba(40, 228, 255, 0.22)";
       });
+
+      if (selectedAnswers[q.questionId] === idx) {
+        btn.style.borderColor = "rgba(37, 232, 255, 0.88)";
+        btn.style.boxShadow = "0 0 14px rgba(40, 228, 255, 0.22)";
+      }
 
       choices.appendChild(btn);
     });
@@ -166,6 +171,8 @@ async function loadState() {
     const set = result.activeSet;
     if (!set) {
       activeSetId = null;
+      renderedSetId = null;
+      selectedAnswers = {};
       questionText.textContent = "No active question set yet.";
       questionText.className = "item muted";
       optionsBox.innerHTML = "";
@@ -181,6 +188,7 @@ async function loadState() {
 
     if (result.hasSubmitted) {
       optionsBox.innerHTML = "";
+      renderedSetId = null;
       submitSetBtn.style.display = "none";
       const s = result.submission;
       setStatus(
@@ -191,7 +199,14 @@ async function loadState() {
       return;
     }
 
-    renderQuestionSet(set);
+    const shouldRenderSet = renderedSetId !== set.setId || optionsBox.children.length === 0;
+    if (shouldRenderSet) {
+      if (renderedSetId !== set.setId) {
+        selectedAnswers = {};
+      }
+      renderQuestionSet(set);
+      renderedSetId = set.setId;
+    }
     submitSetBtn.style.display = "inline-block";
     setStatus(answerStatus, "Select answers for all questions and click Submit All Answers.", "");
   } catch (error) {
