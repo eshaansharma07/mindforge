@@ -88,28 +88,26 @@ body::before {
 .brand {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
   font-family: "Orbitron", sans-serif;
-  font-size: 1.9rem;
+  font-size: 0;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
-  background: linear-gradient(100deg, var(--cyan), var(--blue), var(--violet));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: none;
 }
 
 .brand img {
-  width: 62px;
-  height: 62px;
+  width: 74px;
+  height: 74px;
   opacity: 1;
   position: static;
   object-fit: contain;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(96, 170, 235, 0.45);
-  border-radius: 10px;
-  padding: 6px;
-  box-shadow: 0 0 24px rgba(80, 180, 255, 0.26);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
 }
 
 .nav-links {
@@ -138,29 +136,21 @@ body::before {
 .hero-logo-block {
   width: fit-content;
   margin: 0 auto 24px;
-  padding: 12px 16px;
-  border: 1px solid rgba(85, 153, 223, 0.4);
-  background: rgba(4, 10, 28, 0.7);
+  padding: 0;
+  border: none;
+  background: transparent;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 0;
 }
 
 .hero-logo-block img {
-  width: 88px;
-  height: 88px;
+  width: 130px;
+  height: 130px;
   object-fit: contain;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-  padding: 6px;
-}
-
-.hero-logo-block span {
-  font-family: "Orbitron", sans-serif;
-  color: #d9e5ff;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 0.95rem;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
 }
 
 .presents {
@@ -261,29 +251,21 @@ body::before {
 
 .logo-strip {
   margin: 10px 0 20px;
-  padding: 10px 14px;
-  border: 1px solid rgba(85, 153, 223, 0.35);
-  background: rgba(4, 10, 28, 0.65);
+  padding: 0;
+  border: none;
+  background: transparent;
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 0;
 }
 
 .logo-strip img {
-  width: 64px;
-  height: 64px;
+  width: 90px;
+  height: 90px;
   object-fit: contain;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-  padding: 5px;
-}
-
-.logo-strip span {
-  font-family: "Orbitron", sans-serif;
-  text-transform: uppercase;
-  color: #d4deff;
-  font-size: 0.9rem;
-  letter-spacing: 0.8px;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
 }
 
 .scroll-caret {
@@ -631,12 +613,12 @@ input[type="checkbox"] {
   }
 
   .brand {
-    font-size: 1.4rem;
+    font-size: 0;
   }
 
   .brand img {
-    width: 52px;
-    height: 52px;
+    width: 62px;
+    height: 62px;
   }
 
   .nav-links {
@@ -687,13 +669,13 @@ input[type="checkbox"] {
   }
 
   .hero-logo-block {
-    padding: 10px 12px;
-    gap: 10px;
+    padding: 0;
+    gap: 0;
   }
 
   .hero-logo-block img {
-    width: 64px;
-    height: 64px;
+    width: 94px;
+    height: 94px;
   }
 
   .btn {
