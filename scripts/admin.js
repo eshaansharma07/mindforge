@@ -43,6 +43,20 @@ async function api(path, method = "GET", body) {
   return result;
 }
 
+async function deleteTeam(teamId) {
+  if (lockRequired()) return;
+  const confirmDelete = window.confirm(`Delete team ${teamId}? This cannot be undone.`);
+  if (!confirmDelete) return;
+
+  try {
+    await api("/api/admin-delete-team", "POST", { teamId });
+    status(`Team ${teamId} deleted.`, "ok");
+    refreshOverview();
+  } catch (error) {
+    status(error.message || "Failed to delete team.", "err");
+  }
+}
+
 function renderRows(container, rows, empty = "No data") {
   container.innerHTML = "";
   if (!rows || rows.length === 0) {
@@ -92,9 +106,16 @@ async function refreshOverview() {
 
     renderRows(
       teamsBox,
-      data.latestTeams.map((t) => `<strong>${t.teamName}</strong> (${t.teamId})<br/><span class="muted">${t.department}</span>`),
+      data.latestTeams.map(
+        (t) =>
+          `<strong>${t.teamName}</strong> (${t.teamId})<br/><span class="muted">${t.department}</span><br/><button class="btn" type="button" data-delete-team="${t.teamId}" style="margin-top:8px;">Delete Team</button>`
+      ),
       "No registrations yet"
     );
+
+    teamsBox.querySelectorAll("[data-delete-team]").forEach((btn) => {
+      btn.addEventListener("click", () => deleteTeam(btn.getAttribute("data-delete-team")));
+    });
 
     renderRows(
       leaderboardBox,

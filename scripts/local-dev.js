@@ -14,7 +14,8 @@ const handlers = {
   "/api/admin-announcement": require("../api/admin-announcement"),
   "/api/admin-launch-question": require("../api/admin-launch-question"),
   "/api/admin-close-question": require("../api/admin-close-question"),
-  "/api/admin-overview": require("../api/admin-overview")
+  "/api/admin-overview": require("../api/admin-overview"),
+  "/api/admin-delete-team": require("../api/admin-delete-team")
 };
 
 app.use(express.json());
