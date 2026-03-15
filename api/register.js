@@ -47,6 +47,9 @@ module.exports = async (req, res) => {
       member3Name: String(data.member3Name || "").trim(),
       member3Email: String(data.member3Email || "").trim().toLowerCase(),
       member3Roll: String(data.member3Roll || "").trim(),
+      member4Name: String(data.member4Name || "").trim(),
+      member4Email: String(data.member4Email || "").trim().toLowerCase(),
+      member4Roll: String(data.member4Roll || "").trim(),
       domain: String(data.domain || "").trim(),
       termsAccepted: true,
       createdAt: new Date()

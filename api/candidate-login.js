@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
       return send(res, 404, { success: false, message: "Team not found." });
     }
 
-    const allowed = [team.leaderEmail, team.member2Email, team.member3Email]
+    const allowed = [team.leaderEmail, team.member2Email, team.member3Email, team.member4Email]
       .filter(Boolean)
       .map((x) => String(x).toLowerCase());
 

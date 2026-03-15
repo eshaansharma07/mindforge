@@ -22,6 +22,7 @@ module.exports = async (req, res) => {
           leaderName: 1,
           member2Name: 1,
           member3Name: 1,
+          member4Name: 1,
           domain: 1,
           createdAt: 1
         }

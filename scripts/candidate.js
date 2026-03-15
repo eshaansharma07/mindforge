@@ -156,7 +156,12 @@ async function loadState() {
       [
         `<strong>${team.teamName}</strong> (${team.teamId})`,
         `Department: ${team.department}`,
-        `Members: ${team.leaderName}, ${team.member2Name}${team.member3Name ? `, ${team.member3Name}` : ""}`,
+        `Members: ${[
+          team.leaderName,
+          team.member2Name,
+          team.member3Name,
+          team.member4Name
+        ].filter(Boolean).join(", ")}`,
         `Domain: ${team.domain || "Not selected"}`
       ],
       "No team data"
