@@ -4,6 +4,27 @@ const daysEl = document.getElementById("days");
 const hoursEl = document.getElementById("hours");
 const minutesEl = document.getElementById("minutes");
 const secondsEl = document.getElementById("seconds");
+const loaderScreen = document.getElementById("loaderScreen");
+const loaderPercent = document.getElementById("loaderPercent");
+const loaderFill = document.getElementById("loaderFill");
+
+function startLoader() {
+  if (!loaderScreen || !loaderPercent || !loaderFill) return;
+
+  let progress = 0;
+  const timer = setInterval(() => {
+    progress = Math.min(100, progress + Math.ceil(Math.random() * 11));
+    loaderPercent.textContent = `${progress}%`;
+    loaderFill.style.width = `${progress}%`;
+
+    if (progress >= 100) {
+      clearInterval(timer);
+      setTimeout(() => {
+        loaderScreen.classList.add("is-hidden");
+      }, 260);
+    }
+  }, 90);
+}
 
 function updateCountdown() {
   if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return;
@@ -23,6 +44,7 @@ function updateCountdown() {
   secondsEl.textContent = String(seconds).padStart(2, "0");
 }
 
+startLoader();
 updateCountdown();
 setInterval(updateCountdown, 1000);
 

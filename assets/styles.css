@@ -64,6 +64,91 @@ body::before {
   opacity: 0.34;
 }
 
+.loader-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(900px 500px at 15% 80%, rgba(120, 255, 0, 0.08), transparent 60%),
+    radial-gradient(1000px 580px at 80% 40%, rgba(34, 255, 180, 0.08), transparent 65%),
+    #020405;
+  transition: opacity 0.45s ease, visibility 0.45s ease;
+}
+
+.loader-screen.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(59, 255, 78, 0.22) 1px, transparent 1px);
+  background-size: 42px 42px;
+  opacity: 0.3;
+}
+
+.loader-inner {
+  position: relative;
+  width: min(980px, 84vw);
+  text-align: center;
+}
+
+.loader-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: clamp(3rem, 10vw, 7.4rem);
+  line-height: 1;
+  letter-spacing: 2px;
+  color: #81d7ff;
+  text-shadow:
+    6px 0 0 rgba(253, 63, 153, 0.72),
+    -6px 0 0 rgba(96, 255, 129, 0.45);
+}
+
+.loader-panel {
+  width: min(600px, 78vw);
+  margin: 42px auto 0;
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  background: rgba(4, 8, 10, 0.85);
+  padding: 22px 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
+.loader-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  font-family: "Orbitron", sans-serif;
+  color: #53ff2e;
+  font-size: clamp(0.95rem, 2vw, 1.4rem);
+}
+
+.loader-bar {
+  border: 3px solid #28ff1f;
+  height: 46px;
+  padding: 6px;
+}
+
+.loader-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #ff005e, #ff1f8a);
+  transition: width 0.12s linear;
+}
+
+.loader-foot {
+  margin-top: 34px;
+  font-family: "Orbitron", sans-serif;
+  color: rgba(240, 240, 240, 0.82);
+  font-size: clamp(0.8rem, 1.4vw, 1.15rem);
+  letter-spacing: 1px;
+}
+
 .page {
   width: min(1520px, 100vw);
   margin: 24px auto;

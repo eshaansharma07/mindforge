@@ -7,6 +7,22 @@
   <link rel="stylesheet" href="/assets/styles.css" />
 </head>
 <body>
+  <div class="loader-screen" id="loaderScreen">
+    <div class="loader-grid"></div>
+    <div class="loader-inner">
+      <div class="loader-title">MIND FORGE</div>
+      <div class="loader-panel">
+        <div class="loader-meta">
+          <span>&gt; INITIALIZING...</span>
+          <span id="loaderPercent">0%</span>
+        </div>
+        <div class="loader-bar">
+          <div class="loader-fill" id="loaderFill"></div>
+        </div>
+      </div>
+      <div class="loader-foot">CODE_MEETS_CHAOS // SYSTEM_OVERRIDE // MARCH_24_2026</div>
+    </div>
+  </div>
   <div class="grid-glow"></div>
   <main class="page">
     <nav class="nav reveal" id="home">
@@ -68,7 +84,6 @@
         <article class="event-card right">
           <span class="day-tag">Day 1</span>
           <h3>Round 2 — Sudden Coding</h3>
-          <div class="mode">30-Minute Coding Challenge</div>
           <p>Participants solve programming problems within a strict 30-minute time limit.</p>
           <div class="tag-wrap">
             <span>Logical Thinking</span>
