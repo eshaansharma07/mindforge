@@ -7,15 +7,26 @@ const secondsEl = document.getElementById("seconds");
 const loaderScreen = document.getElementById("loaderScreen");
 const loaderPercent = document.getElementById("loaderPercent");
 const loaderFill = document.getElementById("loaderFill");
+const loaderStage = document.getElementById("loaderStage");
 
 function startLoader() {
-  if (!loaderScreen || !loaderPercent || !loaderFill) return;
+  if (!loaderScreen || !loaderPercent || !loaderFill || !loaderStage) return;
 
   let progress = 0;
   const timer = setInterval(() => {
     progress = Math.min(100, progress + Math.ceil(Math.random() * 11));
     loaderPercent.textContent = `${progress}%`;
     loaderFill.style.width = `${progress}%`;
+
+    if (progress < 30) {
+      loaderStage.textContent = "SYNCING EVENT MATRIX";
+    } else if (progress < 60) {
+      loaderStage.textContent = "VALIDATING TEAM PORTALS";
+    } else if (progress < 85) {
+      loaderStage.textContent = "ARMING RAPID ROUNDS";
+    } else {
+      loaderStage.textContent = "LAUNCHING MIND FORGE";
+    }
 
     if (progress >= 100) {
       clearInterval(timer);
