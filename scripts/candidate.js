@@ -7,12 +7,44 @@ const optionsBox = document.getElementById("optionsBox");
 const answerStatus = document.getElementById("answerStatus");
 const countdownEl = document.getElementById("countdown");
 const submitSetBtn = document.getElementById("submitSetBtn");
+const logoutBtn = document.getElementById("logoutBtn");
 
 let activeTeamId = localStorage.getItem("mindforge_team_id") || "";
+let activeSessionToken = localStorage.getItem("mindforge_session_token") || "";
 let activeSetId = null;
 let selectedAnswers = {};
 let renderedSetId = null;
 let timer;
+
+function getOrCreateSessionToken() {
+  if (activeSessionToken) return activeSessionToken;
+  activeSessionToken =
+    (window.crypto && typeof window.crypto.randomUUID === "function" && window.crypto.randomUUID()) ||
+    `mf-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  localStorage.setItem("mindforge_session_token", activeSessionToken);
+  return activeSessionToken;
+}
+
+function clearCandidateAccess() {
+  activeTeamId = "";
+  activeSessionToken = "";
+  activeSetId = null;
+  renderedSetId = null;
+  selectedAnswers = {};
+  clearInterval(timer);
+  localStorage.removeItem("mindforge_team_id");
+  localStorage.removeItem("mindforge_session_token");
+  if (loginForm) loginForm.reset();
+  teamBox.innerHTML = "";
+  announcementBox.innerHTML = "";
+  optionsBox.innerHTML = "";
+  questionText.textContent = "No active question set yet.";
+  questionText.className = "item muted";
+  countdownEl.textContent = "--";
+  submitSetBtn.style.display = "none";
+  answerStatus.textContent = "";
+  answerStatus.className = "status";
+}
 
 function setStatus(el, msg, type = "") {
   el.textContent = msg;
@@ -99,7 +131,7 @@ function renderQuestionSet(set) {
 }
 
 async function submitAllAnswers() {
-  if (!activeTeamId || !activeSetId) return;
+  if (!activeTeamId || !activeSetId || !activeSessionToken) return;
 
   const answers = Object.entries(selectedAnswers).map(([questionId, selectedIndex]) => ({
     questionId,
@@ -118,7 +150,8 @@ async function submitAllAnswers() {
       body: JSON.stringify({
         teamId: activeTeamId,
         setId: activeSetId,
-        answers
+        answers,
+        sessionToken: activeSessionToken
       })
     });
 
@@ -141,10 +174,14 @@ async function submitAllAnswers() {
 }
 
 async function loadState() {
-  if (!activeTeamId) return;
+  if (!activeTeamId || !activeSessionToken) return;
 
   try {
-    const response = await fetch(`/api/candidate-state?teamId=${encodeURIComponent(activeTeamId)}`);
+    const response = await fetch(`/api/candidate-state?teamId=${encodeURIComponent(activeTeamId)}`, {
+      headers: {
+        "x-session-token": activeSessionToken
+      }
+    });
     const result = await response.json();
     if (!response.ok || !result.success) {
       throw new Error(result.message || "Unable to load dashboard.");
@@ -215,16 +252,58 @@ async function loadState() {
     submitSetBtn.style.display = "inline-block";
     setStatus(answerStatus, "Select answers for all questions and click Submit All Answers.", "");
   } catch (error) {
-    setStatus(loginStatus, error.message || "Failed to load state.", "err");
+    const message = error.message || "Failed to load state.";
+    if (
+      message.includes("already logged in on another device") ||
+      message.includes("session expired") ||
+      message.includes("session is required")
+    ) {
+      clearCandidateAccess();
+    }
+    setStatus(loginStatus, message, "err");
+  }
+}
+
+async function logoutCandidate({ silent = false, useBeacon = false } = {}) {
+  if (!activeTeamId || !activeSessionToken) {
+    clearCandidateAccess();
+    return;
+  }
+
+  const payload = JSON.stringify({
+    teamId: activeTeamId,
+    sessionToken: activeSessionToken
+  });
+
+  try {
+    if (useBeacon && navigator.sendBeacon) {
+      const blob = new Blob([payload], { type: "application/json" });
+      navigator.sendBeacon("/api/candidate-logout", blob);
+    } else {
+      await fetch("/api/candidate-logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload
+      });
+    }
+  } catch (_error) {
+    // Best effort logout keeps teams from being stuck if the request fails.
+  }
+
+  clearCandidateAccess();
+  if (!silent) {
+    setStatus(loginStatus, "Team logged out.", "ok");
   }
 }
 
 submitSetBtn?.addEventListener("click", submitAllAnswers);
+logoutBtn?.addEventListener("click", () => logoutCandidate());
 
 loginForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const data = Object.fromEntries(new FormData(loginForm).entries());
   data.teamId = String(data.teamId || "").trim().toUpperCase();
+  data.sessionToken = getOrCreateSessionToken();
 
   setStatus(loginStatus, "Verifying team...", "");
 
@@ -241,7 +320,9 @@ loginForm?.addEventListener("submit", async (event) => {
     }
 
     activeTeamId = result.teamId;
+    activeSessionToken = result.sessionToken;
     localStorage.setItem("mindforge_team_id", activeTeamId);
+    localStorage.setItem("mindforge_session_token", activeSessionToken);
     setStatus(loginStatus, "Dashboard connected.", "ok");
     await loadState();
   } catch (error) {
@@ -249,9 +330,11 @@ loginForm?.addEventListener("submit", async (event) => {
   }
 });
 
-if (activeTeamId) {
+if (activeTeamId && activeSessionToken) {
   setStatus(loginStatus, `Auto-connected with ${activeTeamId}`, "ok");
   loadState();
+} else if (activeTeamId || activeSessionToken) {
+  clearCandidateAccess();
 }
 
 setInterval(loadState, 3000);

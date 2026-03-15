@@ -22,6 +22,7 @@ module.exports = async (req, res) => {
     }
 
     await db.collection("quiz_responses").deleteMany({ teamId });
+    await db.collection("candidate_sessions").deleteMany({ teamId });
 
     return send(res, 200, { success: true, teamId });
   } catch (error) {

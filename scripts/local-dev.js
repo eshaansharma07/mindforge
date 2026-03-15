@@ -8,6 +8,7 @@ const root = path.join(__dirname, "..");
 const handlers = {
   "/api/register": require("../api/register"),
   "/api/candidate-login": require("../api/candidate-login"),
+  "/api/candidate-logout": require("../api/candidate-logout"),
   "/api/candidate-state": require("../api/candidate-state"),
   "/api/submit-answer": require("../api/submit-answer"),
   "/api/admin-auth": require("../api/admin-auth"),

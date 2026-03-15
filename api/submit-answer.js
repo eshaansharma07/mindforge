@@ -1,5 +1,6 @@
 const { getDb } = require("./_lib/db");
 const { send, methodNotAllowed, readBody } = require("./_lib/http");
+const { validateCandidateSession } = require("./_lib/candidate-session");
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") return methodNotAllowed(res);
@@ -9,12 +10,21 @@ module.exports = async (req, res) => {
     const teamId = String(data.teamId || "").trim().toUpperCase();
     const setId = String(data.setId || "").trim();
     const answers = Array.isArray(data.answers) ? data.answers : [];
+    const sessionToken = String(data.sessionToken || "").trim();
 
-    if (!teamId || !setId || answers.length === 0) {
-      return send(res, 400, { success: false, message: "teamId, setId and answers are required." });
+    if (!teamId || !setId || answers.length === 0 || !sessionToken) {
+      return send(res, 400, {
+        success: false,
+        message: "teamId, setId, answers and sessionToken are required."
+      });
     }
 
     const db = await getDb();
+    const session = await validateCandidateSession(db, teamId, sessionToken);
+    if (!session.ok) {
+      return send(res, session.code, { success: false, message: session.message });
+    }
+
     const [team, set] = await Promise.all([
       db.collection("teams").findOne({ teamId }),
       db.collection("quiz_sets").findOne({ setId, isActive: true })

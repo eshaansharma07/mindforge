@@ -1,5 +1,11 @@
 const { getDb } = require("./_lib/db");
 const { send, methodNotAllowed, readBody } = require("./_lib/http");
+const {
+  normalizeToken,
+  sessionExpired,
+  getSession,
+  createOrRefreshSession
+} = require("./_lib/candidate-session");
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") return methodNotAllowed(res);
@@ -8,9 +14,10 @@ module.exports = async (req, res) => {
     const data = readBody(req);
     const teamId = String(data.teamId || "").trim().toUpperCase();
     const email = String(data.email || "").trim().toLowerCase();
+    const sessionToken = normalizeToken(data.sessionToken);
 
-    if (!teamId || !email) {
-      return send(res, 400, { success: false, message: "teamId and email are required." });
+    if (!teamId || !email || !sessionToken) {
+      return send(res, 400, { success: false, message: "teamId, email and sessionToken are required." });
     }
 
     const db = await getDb();
@@ -28,7 +35,21 @@ module.exports = async (req, res) => {
       return send(res, 401, { success: false, message: "Email does not match this team." });
     }
 
-    return send(res, 200, { success: true, teamId });
+    const existingSession = await getSession(db, teamId);
+    if (
+      existingSession &&
+      !sessionExpired(existingSession) &&
+      existingSession.sessionToken !== sessionToken
+    ) {
+      return send(res, 409, {
+        success: false,
+        message: "This team is already logged in on another device. Please log out there first."
+      });
+    }
+
+    await createOrRefreshSession(db, teamId, sessionToken);
+
+    return send(res, 200, { success: true, teamId, sessionToken });
   } catch (error) {
     return send(res, 500, { success: false, message: error.message || "Login failed" });
   }

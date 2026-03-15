@@ -1,16 +1,23 @@
 const { getDb } = require("./_lib/db");
 const { send, methodNotAllowed } = require("./_lib/http");
+const { validateCandidateSession } = require("./_lib/candidate-session");
 
 module.exports = async (req, res) => {
   if (req.method !== "GET") return methodNotAllowed(res);
 
   try {
     const teamId = String(req.query.teamId || "").trim().toUpperCase();
+    const sessionToken = String(req.headers["x-session-token"] || "").trim();
     if (!teamId) {
       return send(res, 400, { success: false, message: "teamId query is required." });
     }
 
     const db = await getDb();
+    const session = await validateCandidateSession(db, teamId, sessionToken);
+    if (!session.ok) {
+      return send(res, session.code, { success: false, message: session.message });
+    }
+
     const team = await db.collection("teams").findOne(
       { teamId },
       {
