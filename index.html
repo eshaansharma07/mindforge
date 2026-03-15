@@ -124,89 +124,62 @@
             </div>
           </div>
 
-          <h3>Team Members (2-4 Members)</h3>
+          <h3>Member Cards (Only Member 1 Is Mandatory)</h3>
 
-          <div class="grid-2">
-            <div>
-              <label>Team Leader Name *</label>
+          <div class="member-cards">
+            <article class="member-card member-card-primary">
+              <div class="member-card-title">Member 1 / Team Leader</div>
+              <label>Full Name *</label>
               <input class="input" name="leaderName" placeholder="Full name" required />
-            </div>
-            <div>
-              <label>Team Leader Email *</label>
+              <label>Email *</label>
               <input class="input" name="leaderEmail" type="email" placeholder="Email address" required />
-            </div>
-          </div>
-
-          <div class="grid-2">
-            <div>
-              <label>Team Leader Phone *</label>
+              <label>Phone *</label>
               <input class="input" name="leaderPhone" placeholder="Phone number" required />
-            </div>
-            <div>
-              <label>Team Leader Roll *</label>
+              <label>Roll Number *</label>
               <input class="input" name="leaderRoll" placeholder="Roll number" required />
-            </div>
-          </div>
+            </article>
 
-          <div class="grid-2">
-            <div>
-              <label>Member 2 Name *</label>
-              <input class="input" name="member2Name" required />
-            </div>
-            <div>
-              <label>Member 2 Email *</label>
-              <input class="input" name="member2Email" type="email" required />
-            </div>
-          </div>
+            <article class="member-card">
+              <div class="member-card-title">Member 2</div>
+              <label>Full Name</label>
+              <input class="input" name="member2Name" placeholder="Optional member" />
+              <label>Email</label>
+              <input class="input" name="member2Email" type="email" placeholder="Optional email" />
+              <label>Roll Number</label>
+              <input class="input" name="member2Roll" placeholder="Optional roll number" />
+            </article>
 
-          <div class="grid-2">
-            <div>
-              <label>Member 2 Roll *</label>
-              <input class="input" name="member2Roll" required />
-            </div>
-            <div>
-              <label>Preferred Domain</label>
-              <select name="domain">
-                <option value="">Select one</option>
-                <option>AIML</option>
-                <option>Data Science</option>
-                <option>Cloud</option>
-                <option>Cybersecurity</option>
-                <option>Full Stack</option>
-              </select>
-            </div>
-          </div>
+            <article class="member-card">
+              <div class="member-card-title">Member 3</div>
+              <label>Full Name</label>
+              <input class="input" name="member3Name" placeholder="Optional member" />
+              <label>Email</label>
+              <input class="input" name="member3Email" type="email" placeholder="Optional email" />
+              <label>Roll Number</label>
+              <input class="input" name="member3Roll" placeholder="Optional roll number" />
+            </article>
 
-          <div class="grid-2">
-            <div>
-              <label>Member 3 Name (Optional)</label>
-              <input class="input" name="member3Name" />
-            </div>
-            <div>
-              <label>Member 3 Email (Optional)</label>
-              <input class="input" name="member3Email" type="email" />
-            </div>
+            <article class="member-card">
+              <div class="member-card-title">Member 4</div>
+              <label>Full Name</label>
+              <input class="input" name="member4Name" placeholder="Optional member" />
+              <label>Email</label>
+              <input class="input" name="member4Email" type="email" placeholder="Optional email" />
+              <label>Roll Number</label>
+              <input class="input" name="member4Roll" placeholder="Optional roll number" />
+            </article>
           </div>
 
           <div>
-            <label>Member 3 Roll (Optional)</label>
-            <input class="input" name="member3Roll" />
-          </div>
-
-          <div class="grid-2">
-            <div>
-              <label>Member 4 Name (Optional)</label>
-              <input class="input" name="member4Name" />
-            </div>
-            <div>
-              <label>Member 4 Email (Optional)</label>
-              <input class="input" name="member4Email" type="email" />
-            </div>
-          </div>
-
-          <div>
-            <label>Member 4 Roll (Optional)</label>
-            <input class="input" name="member4Roll" />
+            <label>Preferred Domain</label>
+            <select name="domain">
+              <option value="">Select one</option>
+              <option>AIML</option>
+              <option>Data Science</option>
+              <option>Cloud</option>
+              <option>Cybersecurity</option>
+              <option>Full Stack</option>
+            </select>
           </div>
 
           <label><input type="checkbox" name="terms" required /> I confirm all details are valid and agree to all event rules.</label>

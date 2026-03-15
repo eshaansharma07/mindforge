@@ -14,10 +14,7 @@ module.exports = async (req, res) => {
       "leaderName",
       "leaderEmail",
       "leaderPhone",
-      "leaderRoll",
-      "member2Name",
-      "member2Email",
-      "member2Roll"
+      "leaderRoll"
     ];
 
     for (const field of requiredFields) {
@@ -41,9 +38,9 @@ module.exports = async (req, res) => {
       leaderEmail: String(data.leaderEmail).trim().toLowerCase(),
       leaderPhone: String(data.leaderPhone).trim(),
       leaderRoll: String(data.leaderRoll).trim(),
-      member2Name: String(data.member2Name).trim(),
-      member2Email: String(data.member2Email).trim().toLowerCase(),
-      member2Roll: String(data.member2Roll).trim(),
+      member2Name: String(data.member2Name || "").trim(),
+      member2Email: String(data.member2Email || "").trim().toLowerCase(),
+      member2Roll: String(data.member2Roll || "").trim(),
       member3Name: String(data.member3Name || "").trim(),
       member3Email: String(data.member3Email || "").trim().toLowerCase(),
       member3Roll: String(data.member3Roll || "").trim(),
