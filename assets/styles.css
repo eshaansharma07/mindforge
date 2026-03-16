@@ -398,13 +398,14 @@ body::before {
   display: flex;
   justify-content: center;
   align-items: stretch;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 16px;
-  width: min(920px, 100%);
+  width: min(1180px, 100%);
 }
 
 .identity-card {
-  min-width: 250px;
+  flex: 1 1 0;
+  min-width: 0;
   padding: 18px 20px;
   border: 1px solid rgba(84, 140, 230, 0.28);
   background: linear-gradient(135deg, rgba(6, 11, 29, 0.82), rgba(10, 18, 44, 0.56));
@@ -418,9 +419,10 @@ body::before {
 .identity-label {
   font-family: "Orbitron", sans-serif;
   font-size: 0.82rem;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--cyan);
+  text-align: center;
 }
 
 .identity-logo {
@@ -430,15 +432,15 @@ body::before {
 }
 
 .cu-logo {
-  width: 360px;
+  width: min(100%, 320px);
 }
 
 .ai-inline {
-  width: 220px;
+  width: min(100%, 190px);
 }
 
 .unstop-inline {
-  width: 220px;
+  width: min(100%, 210px);
 }
 
 .count-row {
@@ -987,11 +989,13 @@ input[type="checkbox"] {
 
   .identity-strip {
     margin-top: 22px;
+    flex-wrap: wrap;
   }
 
   .identity-card {
     min-width: 230px;
     padding: 16px;
+    flex: 1 1 260px;
   }
 
   .cu-logo {
@@ -1131,6 +1135,7 @@ input[type="checkbox"] {
     width: 100%;
     min-width: 0;
     padding: 15px 14px;
+    flex: 1 1 100%;
   }
 
   .identity-label {
