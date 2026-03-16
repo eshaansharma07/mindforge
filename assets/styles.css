@@ -872,6 +872,11 @@ input[type="checkbox"] {
 }
 
 @media (max-width: 860px) {
+  body::before {
+    background-size: 40px 40px;
+    opacity: 0.22;
+  }
+
   .schedule-track::before {
     display: none;
   }
@@ -893,7 +898,7 @@ input[type="checkbox"] {
   }
 
   .hero-main {
-    padding-top: 38px;
+    padding: 38px 18px 30px;
   }
 
   .presents {
@@ -901,8 +906,13 @@ input[type="checkbox"] {
     letter-spacing: 4px;
   }
 
+  .hero-sub {
+    margin-top: 18px;
+  }
+
   .hero-tags {
     font-size: 1rem;
+    line-height: 1.5;
   }
 
   .hero-logo-block {
@@ -923,6 +933,14 @@ input[type="checkbox"] {
   .member-cards {
     grid-template-columns: 1fr;
   }
+
+  .event-card h3 {
+    font-size: 1.6rem;
+  }
+
+  .rule h4 {
+    font-size: 1.35rem;
+  }
 }
 
 @media (max-width: 620px) {
@@ -934,22 +952,265 @@ input[type="checkbox"] {
 
   .nav {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    padding: 16px 14px;
+    gap: 14px;
+  }
+
+  .brand {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .quick-brand {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .nav-links {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px 8px;
+  }
+
+  .nav-links a {
+    display: block;
+    text-align: center;
+    padding: 10px 8px;
+    border: 1px solid rgba(84, 140, 230, 0.22);
+    background: rgba(6, 11, 29, 0.5);
+    font-size: 0.78rem;
   }
 
   .content {
     width: min(94vw, 94vw);
+    padding: 8px 0 40px;
   }
 
   .rules-grid {
     grid-template-columns: 1fr;
   }
 
+  .section-title {
+    margin: 46px 0 28px;
+  }
+
+  .section-title h2 {
+    font-size: clamp(1.55rem, 8vw, 2.3rem);
+    line-height: 1.12;
+  }
+
+  .section-title h2::before {
+    margin-right: 10px;
+  }
+
+  .section-title p {
+    font-size: 0.98rem;
+    line-height: 1.45;
+    padding: 0 4px;
+  }
+
+  .hero-main {
+    padding: 28px 14px 24px;
+  }
+
+  .presents {
+    font-size: 0.95rem;
+    letter-spacing: 3px;
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 16vw, 4.5rem);
+    line-height: 0.94;
+  }
+
+  .hero-sub {
+    margin: 18px 0 12px;
+    font-size: 1.12rem;
+    line-height: 1.35;
+  }
+
+  .hero-tags {
+    font-size: 0.88rem;
+    line-height: 1.65;
+  }
+
   .count-row {
-    gap: 12px;
+    gap: 10px;
+    margin-top: 28px;
   }
 
   .time-block {
-    min-width: 40%;
+    min-width: calc(50% - 8px);
+    padding: 12px 10px;
+    border: 1px solid rgba(84, 140, 230, 0.24);
+    background: rgba(5, 10, 28, 0.52);
+  }
+
+  .time-label {
+    letter-spacing: 2px;
+    font-size: 0.78rem;
+  }
+
+  .cta-row {
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  .btn,
+  .content .btn {
+    width: 100%;
+    min-width: 0;
+    padding: 14px 16px;
+    font-size: 0.95rem;
+  }
+
+  .event-card {
+    padding: 20px 18px 18px;
+  }
+
+  .event-card h3 {
+    font-size: 1.28rem;
+    line-height: 1.28;
+  }
+
+  .event-card p,
+  .rule p,
+  .item,
+  .status {
+    font-size: 0.98rem;
+    line-height: 1.45;
+  }
+
+  .tag-wrap span {
+    font-size: 0.72rem;
+    padding: 7px 10px;
+  }
+
+  .register-wrap,
+  .card,
+  .rule {
+    padding: 18px 16px;
+  }
+
+  .member-card {
+    padding: 16px 14px;
+  }
+
+  .member-card-title {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .input,
+  select,
+  textarea {
+    font-size: 1rem;
+    padding: 12px 12px;
+  }
+
+  .countdown {
+    font-size: 2.35rem;
+  }
+
+  .footer {
+    justify-content: center;
+    text-align: center;
+    padding-top: 16px;
+  }
+
+  .footer img {
+    height: 28px;
+  }
+}
+
+@media (max-width: 420px) {
+  .loader-inner {
+    width: min(94vw, 94vw);
+    padding: 26px 12px 18px;
+  }
+
+  .loader-kicker {
+    gap: 8px;
+    padding: 8px 12px;
+    letter-spacing: 0.24em;
+    font-size: 0.7rem;
+  }
+
+  .loader-title {
+    font-size: clamp(2.2rem, 15vw, 3.2rem);
+  }
+
+  .loader-subtitle {
+    font-size: 0.84rem;
+    line-height: 1.5;
+  }
+
+  .loader-panel {
+    width: 100%;
+    margin-top: 28px;
+    padding: 20px 16px 18px;
+    border-radius: 22px;
+  }
+
+  .loader-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 0.78rem;
+    gap: 8px;
+  }
+
+  .loader-foot {
+    letter-spacing: 0.14em;
+    line-height: 1.5;
+  }
+
+  .nav-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .quick-brand {
+    font-size: 1.3rem;
+  }
+
+  .content {
+    width: min(96vw, 96vw);
+  }
+
+  .section-title h2 {
+    font-size: 1.38rem;
+  }
+
+  .presents {
+    letter-spacing: 2px;
+  }
+
+  .hero-title {
+    font-size: clamp(2.15rem, 15vw, 3.5rem);
+  }
+
+  .hero-tags {
+    font-size: 0.8rem;
+  }
+
+  .time-block {
+    min-width: 100%;
+  }
+
+  .event-card h3 {
+    font-size: 1.14rem;
+  }
+
+  .rule h4 {
+    font-size: 1.16rem;
+  }
+
+  .register-wrap,
+  .card,
+  .rule,
+  .member-card {
+    padding-left: 14px;
+    padding-right: 14px;
   }
 }
