@@ -68,6 +68,66 @@ function renderList(container, rows, emptyText) {
   });
 }
 
+function renderPublicLeaderboard(entries) {
+  leaderboardPublicBox.innerHTML = "";
+
+  if (!entries || entries.length === 0) {
+    leaderboardPublicBox.innerHTML =
+      `<div class="item muted">Leaderboard will appear here when published by the controller.</div>`;
+    return;
+  }
+
+  const topThree = entries.slice(0, 3);
+  const others = entries.slice(3);
+
+  const podium = document.createElement("div");
+  podium.className = "leaderboard-podium";
+
+  const podiumOrder = [
+    topThree[1] ? { entry: topThree[1], rank: 2, tone: "silver" } : null,
+    topThree[0] ? { entry: topThree[0], rank: 1, tone: "gold" } : null,
+    topThree[2] ? { entry: topThree[2], rank: 3, tone: "bronze" } : null
+  ].filter(Boolean);
+
+  podiumOrder.forEach(({ entry, rank, tone }) => {
+    const card = document.createElement("article");
+    card.className = `podium-card podium-${tone}`;
+    card.innerHTML = `
+      <div class="podium-rank">#${rank}</div>
+      <div class="podium-team">${entry.teamName || entry.teamId}</div>
+      <div class="podium-id">${entry.teamId}</div>
+      <div class="podium-score">${entry.points}</div>
+      <div class="podium-meta">Points</div>
+      <div class="podium-stats">Correct ${entry.correctCount}/${entry.totalQuestions} • ${Math.round(entry.elapsedMs / 1000)}s</div>
+    `;
+    podium.appendChild(card);
+  });
+
+  leaderboardPublicBox.appendChild(podium);
+
+  if (others.length > 0) {
+    const list = document.createElement("div");
+    list.className = "leaderboard-table";
+
+    others.forEach((entry, index) => {
+      const row = document.createElement("div");
+      row.className = "leaderboard-row";
+      row.innerHTML = `
+        <div class="leaderboard-row-rank">#${index + 4}</div>
+        <div class="leaderboard-row-main">
+          <div class="leaderboard-row-name">${entry.teamName || entry.teamId}</div>
+          <div class="leaderboard-row-id">${entry.teamId}</div>
+        </div>
+        <div class="leaderboard-row-points">${entry.points} pts</div>
+        <div class="leaderboard-row-extra">${entry.correctCount}/${entry.totalQuestions} • ${Math.round(entry.elapsedMs / 1000)}s</div>
+      `;
+      list.appendChild(row);
+    });
+
+    leaderboardPublicBox.appendChild(list);
+  }
+}
+
 function startCountdown(endAt) {
   clearInterval(timer);
   const end = new Date(endAt).getTime();
@@ -219,16 +279,9 @@ async function loadState() {
 
     const publicLeaderboard = result.publicLeaderboard;
     if (publicLeaderboard?.isVisible && (publicLeaderboard.entries || []).length > 0) {
-      renderList(
-        leaderboardPublicBox,
-        publicLeaderboard.entries.map(
-          (entry, index) =>
-            `#${index + 1} <strong>${entry.teamName || entry.teamId}</strong> (${entry.teamId})<br/>Points: ${entry.points} | Correct: ${entry.correctCount}/${entry.totalQuestions} | Time: ${Math.round(entry.elapsedMs / 1000)}s`
-        ),
-        "Leaderboard not available"
-      );
+      renderPublicLeaderboard(publicLeaderboard.entries);
     } else {
-      renderList(leaderboardPublicBox, [], "Leaderboard will appear here when published by the controller.");
+      renderPublicLeaderboard([]);
     }
 
     const set = result.activeSet;
