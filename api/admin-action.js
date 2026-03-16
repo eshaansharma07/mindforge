@@ -208,7 +208,7 @@ module.exports = async (req, res) => {
 
     if (action === "leaderboard") {
       const mode = String(data.mode || "").trim().toLowerCase();
-      if (!["show", "hide", "save"].includes(mode)) {
+      if (!["show", "hide", "save", "reset"].includes(mode)) {
         return send(res, 400, { success: false, message: "Invalid leaderboard mode." });
       }
 
@@ -226,6 +226,23 @@ module.exports = async (req, res) => {
         );
 
         return send(res, 200, { success: true, isVisible: false });
+      }
+
+      if (mode === "reset") {
+        await db.collection("leaderboard_state").updateOne(
+          { key: "public" },
+          {
+            $set: {
+              key: "public",
+              isVisible: false,
+              entries: [],
+              updatedAt: new Date()
+            }
+          },
+          { upsert: true }
+        );
+
+        return send(res, 200, { success: true, isVisible: false, entryCount: 0 });
       }
 
       const entries = normalizeEntries(data.entries);

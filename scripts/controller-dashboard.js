@@ -14,6 +14,7 @@ const leaderboardEditor = document.getElementById("leaderboardEditor");
 const showLeaderboardBtn = document.getElementById("showLeaderboardBtn");
 const saveLeaderboardBtn = document.getElementById("saveLeaderboardBtn");
 const hideLeaderboardBtn = document.getElementById("hideLeaderboardBtn");
+const resetLeaderboardBtn = document.getElementById("resetLeaderboardBtn");
 const leaderboardStatus = document.getElementById("leaderboardStatus");
 
 let adminKey = sessionStorage.getItem("mindforge_admin_key") || "";
@@ -181,7 +182,7 @@ async function updatePublicLeaderboard(action) {
   if (lockRequired()) return;
 
   let entries = [];
-  if (action !== "hide") {
+  if (action !== "hide" && action !== "reset") {
     entries = parseLeaderboardEntries(leaderboardEditor?.value || "");
     if (entries.length === 0) {
       leaderboardMessage("Add at least one valid leaderboard row before updating.", "err");
@@ -189,8 +190,19 @@ async function updatePublicLeaderboard(action) {
     }
   }
 
+  if (action === "reset") {
+    const confirmReset = window.confirm("Reset the leaderboard and remove all pre-existing leaderboard data?");
+    if (!confirmReset) return;
+  }
+
   leaderboardMessage(
-    action === "show" ? "Publishing leaderboard..." : action === "save" ? "Saving leaderboard edits..." : "Hiding leaderboard..."
+    action === "show"
+      ? "Publishing leaderboard..."
+      : action === "save"
+        ? "Saving leaderboard edits..."
+        : action === "hide"
+          ? "Hiding leaderboard..."
+          : "Resetting leaderboard..."
   );
 
   try {
@@ -200,7 +212,9 @@ async function updatePublicLeaderboard(action) {
         ? "Leaderboard is now visible on the candidate portal."
         : action === "save"
           ? "Leaderboard edits saved."
-          : "Leaderboard hidden from the candidate portal.",
+          : action === "hide"
+            ? "Leaderboard hidden from the candidate portal."
+            : "Leaderboard reset and cleared.",
       "ok"
     );
     refreshOverview();
@@ -241,10 +255,9 @@ async function refreshOverview() {
       "No submissions yet"
     );
 
-    const publicEntries =
-      data.leaderboardState && data.leaderboardState.entries && data.leaderboardState.entries.length > 0
-        ? data.leaderboardState.entries
-        : data.leaderboard;
+    const publicEntries = Array.isArray(data.leaderboardState?.entries)
+      ? data.leaderboardState.entries
+      : data.leaderboard;
     if (leaderboardEditor) {
       leaderboardEditor.value = serializeLeaderboardEntries(publicEntries);
     }
@@ -364,6 +377,7 @@ controllerLogoutBtn?.addEventListener("click", () => {
 showLeaderboardBtn?.addEventListener("click", () => updatePublicLeaderboard("show"));
 saveLeaderboardBtn?.addEventListener("click", () => updatePublicLeaderboard("save"));
 hideLeaderboardBtn?.addEventListener("click", () => updatePublicLeaderboard("hide"));
+resetLeaderboardBtn?.addEventListener("click", () => updatePublicLeaderboard("reset"));
 
 status("Controller session restored.", "ok");
 refreshOverview();
