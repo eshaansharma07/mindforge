@@ -17,10 +17,10 @@ adminLoginForm?.addEventListener("submit", async (event) => {
   status("Authenticating controller key...");
 
   try {
-    const response = await fetch("/api/admin-auth", {
+    const response = await fetch("/api/admin-action", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ key })
+      body: JSON.stringify({ action: "auth", key })
     });
 
     const result = await response.json();

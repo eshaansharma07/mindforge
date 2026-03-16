@@ -17,6 +17,7 @@ const hideLeaderboardBtn = document.getElementById("hideLeaderboardBtn");
 const leaderboardStatus = document.getElementById("leaderboardStatus");
 
 let adminKey = sessionStorage.getItem("mindforge_admin_key") || "";
+let sourceSetId = null;
 
 function status(msg, type = "") {
   adminStatus.textContent = msg;
@@ -69,7 +70,7 @@ async function deleteTeam(teamId) {
   if (!confirmDelete) return;
 
   try {
-    await api("/api/admin-delete-team", "POST", { teamId });
+    await api("/api/admin-action", "POST", { action: "deleteTeam", teamId });
     status(`Team ${teamId} deleted.`, "ok");
     refreshOverview();
   } catch (error) {
@@ -83,11 +84,29 @@ async function deleteAnnouncement(announcementId) {
   if (!confirmDelete) return;
 
   try {
-    await api("/api/admin-delete-announcement", "POST", { announcementId });
+    await api("/api/admin-action", "POST", { action: "deleteAnnouncement", announcementId });
     status("Published update removed.", "ok");
     refreshOverview();
   } catch (error) {
     status(error.message || "Failed to delete announcement.", "err");
+  }
+}
+
+async function allowRetry(teamId) {
+  if (lockRequired()) return;
+  const confirmReset = window.confirm(`Allow ${teamId} to attempt this quiz set again?`);
+  if (!confirmReset) return;
+
+  try {
+    await api("/api/admin-action", "POST", {
+      action: "resetAttempt",
+      teamId,
+      setId: sourceSetId
+    });
+    status(`Retry enabled for ${teamId}.`, "ok");
+    refreshOverview();
+  } catch (error) {
+    status(error.message || "Could not reset this team attempt.", "err");
   }
 }
 
@@ -175,7 +194,7 @@ async function updatePublicLeaderboard(action) {
   );
 
   try {
-    await api("/api/admin-leaderboard", "POST", { action, entries });
+    await api("/api/admin-action", "POST", { action: "leaderboard", mode: action, entries });
     leaderboardMessage(
       action === "show"
         ? "Leaderboard is now visible on the candidate portal."
@@ -195,6 +214,7 @@ async function refreshOverview() {
 
   try {
     const data = await api("/api/admin-overview");
+    sourceSetId = data.sourceSetId || null;
     teamsCount.textContent = String(data.teamsCount);
     activeQuestion.textContent = data.activeSet ? "Yes" : "No";
     leaderboardCount.textContent = String(data.leaderboard.length);
@@ -260,10 +280,14 @@ async function refreshOverview() {
           )
           .join("<br/>");
 
-        return `<strong>${row.teamName || row.teamId}</strong> (${row.teamId})<br/>Points: ${row.points} | Correct: ${row.correctCount}/${row.totalQuestions} | Time: ${Math.round(row.elapsedMs / 1000)}s<br/><span class="muted">${answers}</span>`;
+        return `<strong>${row.teamName || row.teamId}</strong> (${row.teamId})<br/>Points: ${row.points} | Correct: ${row.correctCount}/${row.totalQuestions} | Time: ${Math.round(row.elapsedMs / 1000)}s<br/><span class="muted">${answers}</span><br/><button class="btn" type="button" data-allow-retry="${row.teamId}" style="margin-top:8px;">Allow Retry</button>`;
       }),
       "No team submissions yet"
     );
+
+    responsesBox.querySelectorAll("[data-allow-retry]").forEach((btn) => {
+      btn.addEventListener("click", () => allowRetry(btn.getAttribute("data-allow-retry")));
+    });
   } catch (error) {
     if ((error.message || "").toLowerCase().includes("unauthorized")) {
       sessionStorage.removeItem("mindforge_admin_key");
@@ -282,7 +306,7 @@ announcementForm?.addEventListener("submit", async (event) => {
   status("Publishing announcement...");
 
   try {
-    await api("/api/admin-announcement", "POST", form);
+    await api("/api/admin-action", "POST", { action: "publishAnnouncement", ...form });
     status("Announcement published.", "ok");
     announcementForm.reset();
   } catch (error) {
@@ -311,7 +335,7 @@ questionForm?.addEventListener("submit", async (event) => {
   status("Launching question set...");
 
   try {
-    const result = await api("/api/admin-launch-question", "POST", payload);
+    const result = await api("/api/admin-action", "POST", { action: "launchQuestion", ...payload });
     status(`Question set launched. Set ID: ${result.setId} (${result.questionCount} questions)`, "ok");
     questionForm.reset();
     refreshOverview();
@@ -325,7 +349,7 @@ closeQuestionBtn?.addEventListener("click", async () => {
   status("Closing active set...");
 
   try {
-    await api("/api/admin-close-question", "POST");
+    await api("/api/admin-action", "POST", { action: "closeQuestion" });
     status("Question set closed.", "ok");
     refreshOverview();
   } catch (error) {

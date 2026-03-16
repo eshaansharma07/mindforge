@@ -16,6 +16,7 @@ let activeSetId = null;
 let selectedAnswers = {};
 let renderedSetId = null;
 let timer;
+let autoSubmitting = false;
 
 function getOrCreateSessionToken() {
   if (activeSessionToken) return activeSessionToken;
@@ -132,7 +133,7 @@ function renderQuestionSet(set) {
   });
 }
 
-async function submitAllAnswers() {
+async function submitAllAnswers({ force = false, auto = false } = {}) {
   if (!activeTeamId || !activeSetId || !activeSessionToken) return;
 
   const answers = Object.entries(selectedAnswers).map(([questionId, selectedIndex]) => ({
@@ -140,7 +141,7 @@ async function submitAllAnswers() {
     selectedIndex
   }));
 
-  if (answers.length === 0) {
+  if (answers.length === 0 && !force) {
     setStatus(answerStatus, "Select at least one answer before submitting.", "err");
     return;
   }
@@ -148,12 +149,14 @@ async function submitAllAnswers() {
   try {
     const response = await fetch("/api/submit-answer", {
       method: "POST",
+      keepalive: auto,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         teamId: activeTeamId,
         setId: activeSetId,
         answers,
-        sessionToken: activeSessionToken
+        sessionToken: activeSessionToken,
+        submissionMode: auto ? "tab_switch" : "manual"
       })
     });
 
@@ -164,7 +167,9 @@ async function submitAllAnswers() {
 
     setStatus(
       answerStatus,
-      `Submitted. Correct: ${result.correctCount}/${result.totalQuestions} | Points: ${result.points} | Time: ${Math.round(result.elapsedMs / 1000)}s`,
+      auto
+        ? `Auto-submitted. Correct: ${result.correctCount}/${result.totalQuestions} | Points: ${result.points} | Time: ${Math.round(result.elapsedMs / 1000)}s`
+        : `Submitted. Correct: ${result.correctCount}/${result.totalQuestions} | Points: ${result.points} | Time: ${Math.round(result.elapsedMs / 1000)}s`,
       "ok"
     );
 
@@ -312,7 +317,7 @@ async function logoutCandidate({ silent = false, useBeacon = false } = {}) {
   }
 }
 
-submitSetBtn?.addEventListener("click", submitAllAnswers);
+submitSetBtn?.addEventListener("click", () => submitAllAnswers());
 logoutBtn?.addEventListener("click", () => logoutCandidate());
 
 loginForm?.addEventListener("submit", async (event) => {
@@ -354,3 +359,18 @@ if (activeTeamId && activeSessionToken) {
 }
 
 setInterval(loadState, 3000);
+
+document.addEventListener("visibilitychange", () => {
+  if (
+    document.hidden &&
+    activeSetId &&
+    activeSessionToken &&
+    submitSetBtn?.style.display !== "none" &&
+    !autoSubmitting
+  ) {
+    autoSubmitting = true;
+    submitAllAnswers({ force: true, auto: true }).finally(() => {
+      autoSubmitting = false;
+    });
+  }
+});

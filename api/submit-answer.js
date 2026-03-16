@@ -11,11 +11,12 @@ module.exports = async (req, res) => {
     const setId = String(data.setId || "").trim();
     const answers = Array.isArray(data.answers) ? data.answers : [];
     const sessionToken = String(data.sessionToken || "").trim();
+    const submissionMode = String(data.submissionMode || "manual").trim().toLowerCase();
 
-    if (!teamId || !setId || answers.length === 0 || !sessionToken) {
+    if (!teamId || !setId || !sessionToken) {
       return send(res, 400, {
         success: false,
-        message: "teamId, setId, answers and sessionToken are required."
+        message: "teamId, setId and sessionToken are required."
       });
     }
 
@@ -84,6 +85,7 @@ module.exports = async (req, res) => {
       correctCount,
       points,
       elapsedMs,
+      submissionMode,
       answers: evaluatedAnswers,
       submittedAt: new Date()
     });

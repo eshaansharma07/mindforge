@@ -104,6 +104,7 @@ module.exports = async (req, res) => {
       teamsCount,
       latestTeams,
       activeSet,
+      sourceSetId: sourceSet ? sourceSet.setId : null,
       latestAnnouncements,
       leaderboard,
       leaderboardState: {
