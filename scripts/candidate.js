@@ -84,16 +84,17 @@ function renderPublicLeaderboard(entries) {
   podium.className = "leaderboard-podium";
 
   const podiumOrder = [
-    topThree[1] ? { entry: topThree[1], rank: 2, tone: "silver" } : null,
-    topThree[0] ? { entry: topThree[0], rank: 1, tone: "gold" } : null,
-    topThree[2] ? { entry: topThree[2], rank: 3, tone: "bronze" } : null
+    topThree[1] ? { entry: topThree[1], rank: 2, tone: "silver", medal: "🥈" } : null,
+    topThree[0] ? { entry: topThree[0], rank: 1, tone: "gold", medal: "🥇" } : null,
+    topThree[2] ? { entry: topThree[2], rank: 3, tone: "bronze", medal: "🥉" } : null
   ].filter(Boolean);
 
-  podiumOrder.forEach(({ entry, rank, tone }) => {
+  podiumOrder.forEach(({ entry, rank, tone, medal }) => {
     const card = document.createElement("article");
     card.className = `podium-card podium-${tone}`;
     card.innerHTML = `
       <div class="podium-rank">#${rank}</div>
+      <div class="podium-medal" aria-hidden="true">${medal}</div>
       <div class="podium-team">${entry.teamName || entry.teamId}</div>
       <div class="podium-id">${entry.teamId}</div>
       <div class="podium-score">${entry.points}</div>

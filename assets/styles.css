@@ -964,6 +964,17 @@ input[type="checkbox"] {
   height: 4px;
 }
 
+.podium-card::after {
+  content: "";
+  position: absolute;
+  inset: auto 12% -38px 12%;
+  height: 84px;
+  filter: blur(26px);
+  opacity: 0.38;
+  pointer-events: none;
+  animation: podiumPulse 2.8s ease-in-out infinite;
+}
+
 .podium-gold {
   min-height: 256px;
   transform: translateY(-10px);
@@ -973,12 +984,24 @@ input[type="checkbox"] {
   background: linear-gradient(90deg, #ffe082, #ffd54f, #f6b800);
 }
 
+.podium-gold::after {
+  background: radial-gradient(circle, rgba(255, 213, 79, 0.55), transparent 70%);
+}
+
 .podium-silver::before {
   background: linear-gradient(90deg, #d7deef, #b7c3da, #93a0b8);
 }
 
+.podium-silver::after {
+  background: radial-gradient(circle, rgba(199, 210, 232, 0.48), transparent 70%);
+}
+
 .podium-bronze::before {
   background: linear-gradient(90deg, #e2a874, #bf7a46, #8f4f25);
+}
+
+.podium-bronze::after {
+  background: radial-gradient(circle, rgba(191, 122, 70, 0.46), transparent 70%);
 }
 
 .podium-rank {
@@ -986,6 +1009,13 @@ input[type="checkbox"] {
   font-size: 1rem;
   letter-spacing: 0.18em;
   color: var(--cyan);
+}
+
+.podium-medal {
+  margin-top: 14px;
+  font-size: 2.1rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.14));
 }
 
 .podium-team {
@@ -1071,6 +1101,18 @@ input[type="checkbox"] {
   color: #b8c6e1;
   white-space: nowrap;
   font-size: 0.92rem;
+}
+
+@keyframes podiumPulse {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scaleX(0.92);
+  }
+  50% {
+    opacity: 0.52;
+    transform: scaleX(1);
+  }
 }
 
 .item {
@@ -1254,6 +1296,10 @@ html[data-theme="light"] .podium-card,
 html[data-theme="light"] .leaderboard-row {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(239, 245, 255, 0.86));
   box-shadow: 0 12px 26px rgba(89, 118, 166, 0.08);
+}
+
+html[data-theme="light"] .podium-card::after {
+  opacity: 0.28;
 }
 
 html[data-theme="light"] .podium-stats,
