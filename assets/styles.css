@@ -393,6 +393,50 @@ body::before {
   letter-spacing: 1px;
 }
 
+.identity-strip {
+  margin: 28px auto 0;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 16px;
+  width: min(920px, 100%);
+}
+
+.identity-card {
+  min-width: 250px;
+  padding: 18px 20px;
+  border: 1px solid rgba(84, 140, 230, 0.28);
+  background: linear-gradient(135deg, rgba(6, 11, 29, 0.82), rgba(10, 18, 44, 0.56));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.identity-label {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+.identity-logo {
+  display: block;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.cu-logo {
+  width: 360px;
+}
+
+.unstop-inline {
+  width: 220px;
+}
+
 .count-row {
   display: flex;
   justify-content: center;
@@ -825,6 +869,24 @@ input[type="checkbox"] {
   width: auto;
 }
 
+.footer-logos {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.footer-logo {
+  display: block;
+  width: auto;
+  object-fit: contain;
+}
+
+.cu-footer-logo {
+  height: 42px;
+}
+
 .muted {
   color: var(--muted);
 }
@@ -913,6 +975,19 @@ input[type="checkbox"] {
   .hero-tags {
     font-size: 1rem;
     line-height: 1.5;
+  }
+
+  .identity-strip {
+    margin-top: 22px;
+  }
+
+  .identity-card {
+    min-width: 230px;
+    padding: 16px;
+  }
+
+  .cu-logo {
+    width: 300px;
   }
 
   .hero-logo-block {
@@ -1036,6 +1111,29 @@ input[type="checkbox"] {
     line-height: 1.65;
   }
 
+  .identity-strip {
+    gap: 12px;
+  }
+
+  .identity-card {
+    width: 100%;
+    min-width: 0;
+    padding: 15px 14px;
+  }
+
+  .identity-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+  }
+
+  .cu-logo {
+    width: min(100%, 290px);
+  }
+
+  .unstop-inline {
+    width: min(100%, 180px);
+  }
+
   .count-row {
     gap: 10px;
     margin-top: 28px;
@@ -1120,6 +1218,10 @@ input[type="checkbox"] {
     padding-top: 16px;
   }
 
+  .footer-logos {
+    justify-content: center;
+  }
+
   .footer img {
     height: 28px;
   }
@@ -1192,6 +1294,14 @@ input[type="checkbox"] {
 
   .hero-tags {
     font-size: 0.8rem;
+  }
+
+  .cu-logo {
+    width: min(100%, 250px);
+  }
+
+  .cu-footer-logo {
+    height: 34px;
   }
 
   .time-block {
