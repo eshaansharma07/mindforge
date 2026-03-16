@@ -473,15 +473,6 @@ body::before {
   object-fit: contain;
 }
 
-.organized-row {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  flex-wrap: nowrap;
-}
-
 .cu-logo {
   width: min(100%, 320px);
 }
@@ -492,29 +483,6 @@ body::before {
 
 .unstop-inline {
   width: min(100%, 210px);
-}
-
-.apex-text-block {
-  display: grid;
-  gap: 4px;
-  text-align: left;
-  justify-items: start;
-}
-
-.apex-text {
-  font-family: "Orbitron", sans-serif;
-  text-transform: uppercase;
-  line-height: 1.05;
-}
-
-.apex-text-gold {
-  color: #f2cb6b;
-  font-size: clamp(0.92rem, 1.7vw, 1.2rem);
-}
-
-.apex-text-silver {
-  color: #d7deef;
-  font-size: clamp(1.1rem, 2vw, 1.52rem);
 }
 
 .count-row {
@@ -1126,10 +1094,6 @@ html[data-theme="light"] .contact-card {
   box-shadow: 0 12px 26px rgba(89, 118, 166, 0.08);
 }
 
-html[data-theme="light"] .apex-text-silver {
-  color: #30415e;
-}
-
 html[data-theme="light"] .contact-name {
   color: #20304f;
 }
@@ -1264,10 +1228,6 @@ html[data-theme="light"] .footer {
     min-width: 230px;
     padding: 16px;
     flex: 1 1 260px;
-  }
-
-  .organized-row {
-    gap: 14px;
   }
 
   .cu-logo {
@@ -1423,25 +1383,6 @@ html[data-theme="light"] .footer {
     min-width: 0;
     padding: 15px 14px;
     flex: 1 1 100%;
-  }
-
-  .organized-row {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .apex-text-block {
-    width: 100%;
-    text-align: center;
-    justify-items: center;
-  }
-
-  .apex-text-gold {
-    font-size: 0.78rem;
-  }
-
-  .apex-text-silver {
-    font-size: 1rem;
   }
 
   .identity-label {
@@ -1633,11 +1574,6 @@ html[data-theme="light"] .footer {
 
   .ai-inline {
     width: min(100%, 160px);
-  }
-
-  .apex-text-block {
-    text-align: center;
-    justify-items: center;
   }
 
   .cu-footer-logo {
