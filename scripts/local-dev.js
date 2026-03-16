@@ -13,6 +13,7 @@ const handlers = {
   "/api/submit-answer": require("../api/submit-answer"),
   "/api/admin-auth": require("../api/admin-auth"),
   "/api/admin-announcement": require("../api/admin-announcement"),
+  "/api/admin-delete-announcement": require("../api/admin-delete-announcement"),
   "/api/admin-launch-question": require("../api/admin-launch-question"),
   "/api/admin-close-question": require("../api/admin-close-question"),
   "/api/admin-overview": require("../api/admin-overview"),

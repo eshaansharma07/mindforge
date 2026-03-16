@@ -9,6 +9,7 @@ const leaderboardCount = document.getElementById("leaderboardCount");
 const teamsBox = document.getElementById("teamsBox");
 const leaderboardBox = document.getElementById("leaderboardBox");
 const responsesBox = document.getElementById("responsesBox");
+const announcementsBox = document.getElementById("announcementsBox");
 
 let adminKey = sessionStorage.getItem("mindforge_admin_key") || "";
 
@@ -62,6 +63,20 @@ async function deleteTeam(teamId) {
     refreshOverview();
   } catch (error) {
     status(error.message || "Failed to delete team.", "err");
+  }
+}
+
+async function deleteAnnouncement(announcementId) {
+  if (lockRequired()) return;
+  const confirmDelete = window.confirm("Remove this published update?");
+  if (!confirmDelete) return;
+
+  try {
+    await api("/api/admin-delete-announcement", "POST", { announcementId });
+    status("Published update removed.", "ok");
+    refreshOverview();
+  } catch (error) {
+    status(error.message || "Failed to delete announcement.", "err");
   }
 }
 
@@ -133,6 +148,21 @@ async function refreshOverview() {
       ),
       "No submissions yet"
     );
+
+    renderRows(
+      announcementsBox,
+      (data.latestAnnouncements || []).map(
+        (announcement) =>
+          `<strong>${announcement.title}</strong><br/><span class="muted">${announcement.body}</span><br/><button class="btn" type="button" data-delete-announcement="${announcement.announcementId}" style="margin-top:8px;">Delete Update</button>`
+      ),
+      "No published updates yet"
+    );
+
+    announcementsBox.querySelectorAll("[data-delete-announcement]").forEach((btn) => {
+      btn.addEventListener("click", () =>
+        deleteAnnouncement(btn.getAttribute("data-delete-announcement"))
+      );
+    });
 
     renderRows(
       responsesBox,

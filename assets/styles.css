@@ -921,6 +921,12 @@ input[type="checkbox"] {
   padding: 18px;
 }
 
+.panel-divider {
+  height: 1px;
+  margin: 22px 0 18px;
+  background: linear-gradient(90deg, transparent, rgba(84, 140, 230, 0.38), transparent);
+}
+
 .list {
   display: grid;
   gap: 10px;

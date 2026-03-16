@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
   try {
     const db = await getDb();
 
-    const [teamsCount, latestTeams, activeSetRaw, latestAnnouncements] = await Promise.all([
+    const [teamsCount, latestTeams, activeSetRaw, latestAnnouncementsRaw] = await Promise.all([
       db.collection("teams").countDocuments(),
       db.collection("teams")
         .find({}, { projection: { _id: 0, teamId: 1, teamName: 1, department: 1, createdAt: 1 } })
@@ -16,8 +16,16 @@ module.exports = async (req, res) => {
         .limit(8)
         .toArray(),
       db.collection("quiz_sets").findOne({ isActive: true }),
-      db.collection("announcements").find({}, { projection: { _id: 0 } }).sort({ createdAt: -1 }).limit(5).toArray()
+      db.collection("announcements").find({}).sort({ createdAt: -1 }).limit(8).toArray()
     ]);
+
+    const latestAnnouncements = latestAnnouncementsRaw.map((announcement) => ({
+      announcementId: String(announcement._id),
+      title: announcement.title,
+      body: announcement.body,
+      type: announcement.type,
+      createdAt: announcement.createdAt
+    }));
 
     let activeSet = null;
     let leaderboard = [];
