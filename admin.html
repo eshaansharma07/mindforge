@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Controller | Mind Forge 2026</title>
+  <title>Controller Access | Mind Forge 2026</title>
   <script>
     document.documentElement.dataset.theme = localStorage.getItem("mindforge_theme") || "dark";
   </script>
@@ -29,9 +29,9 @@
 
     <section class="content">
       <header class="section-title reveal">
-        <h2>Controller Dashboard</h2>
+        <h2>Controller Access</h2>
         <div class="divider"></div>
-        <p>Launch multiple questions as one 60-second set and evaluate each team by correctness and points.</p>
+        <p>Authorized controllers can unlock the event command center using the secure access key.</p>
       </header>
 
       <section class="admin-access reveal">
@@ -40,87 +40,16 @@
           <form id="adminLoginForm">
             <label>Controller Key</label>
             <input class="input" name="key" type="password" required />
-            <button class="btn primary" type="submit">Unlock Panel</button>
+            <button class="btn primary" type="submit">Open Dashboard</button>
             <p id="adminStatus" class="status"></p>
           </form>
         </article>
       </section>
 
-      <div id="adminProtected" class="admin-protected" hidden>
-      <section class="section reveal">
-        <article class="card">
-          <h3>Overview</h3>
-          <div class="count-row" style="gap:22px;justify-content:flex-start;">
-            <div class="time-block"><div id="teamsCount" class="time-num" style="font-size:2.2rem;">0</div><div class="time-label">Teams</div></div>
-            <div class="time-block"><div id="activeQuestion" class="time-num" style="font-size:2.2rem;">No</div><div class="time-label">Set Active</div></div>
-            <div class="time-block"><div id="leaderboardCount" class="time-num" style="font-size:2.2rem;">0</div><div class="time-label">Submissions</div></div>
-          </div>
-        </article>
-      </section>
-
-      <section class="section reveal">
-        <article class="card">
-          <h3>Publish Update</h3>
-          <form id="announcementForm">
-            <label>Title</label>
-            <input class="input" name="title" required />
-
-            <label>Message</label>
-            <textarea name="body" required></textarea>
-
-            <label>Type</label>
-            <select name="type">
-              <option value="info">Info</option>
-              <option value="alert">Alert</option>
-              <option value="result">Result</option>
-            </select>
-
-            <button class="btn" type="submit">Push Announcement</button>
-          </form>
-        </article>
-
-        <article class="card">
-          <h3>Launch Question Set</h3>
-          <form id="questionForm">
-            <label>Questions (One per line)</label>
-            <textarea name="batchQuestions" placeholder="Question text || Option A || Option B || Option C || 0"></textarea>
-            <p class="muted">Format per line: Question || Option1 || Option2 || ... || CorrectOptionIndex(0-based)</p>
-
-            <label>Duration (Seconds)</label>
-            <input class="input" type="number" min="15" value="60" name="durationSec" required />
-
-            <label>Points per Correct Answer</label>
-            <input class="input" type="number" min="1" value="10" name="pointsPerCorrect" required />
-
-            <div class="cta-row" style="justify-content:flex-start;margin-top:10px;">
-              <button class="btn primary" type="submit">Launch Set</button>
-              <button class="btn" id="closeQuestionBtn" type="button">Close Active Set</button>
-            </div>
-          </form>
-        </article>
-      </section>
-
-      <section class="section reveal">
-        <article class="card">
-          <h3>Latest Teams</h3>
-          <div id="teamsBox" class="list"></div>
-        </article>
-
-        <article class="card">
-          <h3>Leaderboard (Points)</h3>
-          <div id="leaderboardBox" class="list"></div>
-        </article>
-      </section>
-
-      <section class="card reveal">
-        <h3>Team Answer Review (Correct/Incorrect)</h3>
-        <div id="responsesBox" class="list"></div>
-      </section>
-
       <footer class="footer reveal">
         <div>
-          <div class="muted">Admin Controller | Mind Forge 2026</div>
-          <div class="muted">Only authorized event controllers should access this panel</div>
+          <div class="muted">Controller Access | Mind Forge 2026</div>
+          <div class="muted">Only authorized event controllers should proceed beyond this point</div>
         </div>
         <div class="footer-logos">
           <img
@@ -134,11 +63,10 @@
           <img class="footer-logo" src="/assets/unstop-logo.svg" alt="Unstop Logo" />
         </div>
       </footer>
-      </div>
     </section>
   </main>
 
   <script src="/scripts/theme.js"></script>
-  <script src="/scripts/admin.js"></script>
+  <script src="/scripts/admin-login.js"></script>
 </body>
 </html>

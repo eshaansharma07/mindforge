@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controller Dashboard | Mind Forge 2026</title>
+  <script>
+    document.documentElement.dataset.theme = localStorage.getItem("mindforge_theme") || "dark";
+  </script>
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <div class="grid-glow"></div>
+  <main class="page">
+    <nav class="nav reveal">
+      <div class="brand">
+        <span class="quick-brand">MING FORGE</span>
+      </div>
+      <div class="nav-actions">
+        <div class="nav-links">
+          <a href="/index.html">Home</a>
+          <a href="/index.html#events">Events</a>
+          <a href="/candidate.html">Portal</a>
+          <a href="/controller-dashboard.html">Controller</a>
+        </div>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">Light Mode</button>
+      </div>
+    </nav>
+
+    <section class="content">
+      <header class="section-title reveal">
+        <h2>Controller Dashboard</h2>
+        <div class="divider"></div>
+        <p>Launch multiple questions as one 60-second set and evaluate each team by correctness and points.</p>
+      </header>
+
+      <section class="section reveal">
+        <article class="card">
+          <h3>Overview</h3>
+          <div class="count-row" style="gap:22px;justify-content:flex-start;">
+            <div class="time-block"><div id="teamsCount" class="time-num" style="font-size:2.2rem;">0</div><div class="time-label">Teams</div></div>
+            <div class="time-block"><div id="activeQuestion" class="time-num" style="font-size:2.2rem;">No</div><div class="time-label">Set Active</div></div>
+            <div class="time-block"><div id="leaderboardCount" class="time-num" style="font-size:2.2rem;">0</div><div class="time-label">Submissions</div></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Session Control</h3>
+          <p class="muted">This controller session is authorized for live event operations.</p>
+          <div class="cta-row" style="justify-content:flex-start;margin-top:14px;">
+            <button class="btn" id="controllerLogoutBtn" type="button">Exit Controller</button>
+          </div>
+          <p id="adminStatus" class="status"></p>
+        </article>
+      </section>
+
+      <section class="section reveal">
+        <article class="card">
+          <h3>Publish Update</h3>
+          <form id="announcementForm">
+            <label>Title</label>
+            <input class="input" name="title" required />
+
+            <label>Message</label>
+            <textarea name="body" required></textarea>
+
+            <label>Type</label>
+            <select name="type">
+              <option value="info">Info</option>
+              <option value="alert">Alert</option>
+              <option value="result">Result</option>
+            </select>
+
+            <button class="btn" type="submit">Push Announcement</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <h3>Launch Question Set</h3>
+          <form id="questionForm">
+            <label>Questions (One per line)</label>
+            <textarea name="batchQuestions" placeholder="Question text || Option A || Option B || Option C || 0"></textarea>
+            <p class="muted">Format per line: Question || Option1 || Option2 || ... || CorrectOptionIndex(0-based)</p>
+
+            <label>Duration (Seconds)</label>
+            <input class="input" type="number" min="15" value="60" name="durationSec" required />
+
+            <label>Points per Correct Answer</label>
+            <input class="input" type="number" min="1" value="10" name="pointsPerCorrect" required />
+
+            <div class="cta-row" style="justify-content:flex-start;margin-top:10px;">
+              <button class="btn primary" type="submit">Launch Set</button>
+              <button class="btn" id="closeQuestionBtn" type="button">Close Active Set</button>
+            </div>
+          </form>
+        </article>
+      </section>
+
+      <section class="section reveal">
+        <article class="card">
+          <h3>Latest Teams</h3>
+          <div id="teamsBox" class="list"></div>
+        </article>
+
+        <article class="card">
+          <h3>Leaderboard (Points)</h3>
+          <div id="leaderboardBox" class="list"></div>
+        </article>
+      </section>
+
+      <section class="card reveal">
+        <h3>Team Answer Review (Correct/Incorrect)</h3>
+        <div id="responsesBox" class="list"></div>
+      </section>
+
+      <footer class="footer reveal">
+        <div>
+          <div class="muted">Controller Dashboard | Mind Forge 2026</div>
+          <div class="muted">Only authorized event controllers should access this panel</div>
+        </div>
+        <div class="footer-logos">
+          <img
+            class="footer-logo ai-footer-logo theme-ai-logo"
+            src="/assets/ai-alliance-cropped.svg"
+            data-logo-dark="/assets/ai-alliance-cropped.svg"
+            data-logo-light="/assets/ai-alliance-light.svg"
+            alt="AI Alliance Logo"
+          />
+          <img class="footer-logo cu-footer-logo" src="https://www.cuchd.in/about/assets/images/cu-logo.png" alt="Chandigarh University Logo" />
+          <img class="footer-logo" src="/assets/unstop-logo.svg" alt="Unstop Logo" />
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <script src="/scripts/theme.js"></script>
+  <script src="/scripts/controller-dashboard.js"></script>
+</body>
+</html>

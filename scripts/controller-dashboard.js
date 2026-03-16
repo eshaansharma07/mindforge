@@ -1,9 +1,8 @@
-const adminLoginForm = document.getElementById("adminLoginForm");
-const adminStatus = document.getElementById("adminStatus");
-const adminProtected = document.getElementById("adminProtected");
 const announcementForm = document.getElementById("announcementForm");
 const questionForm = document.getElementById("questionForm");
 const closeQuestionBtn = document.getElementById("closeQuestionBtn");
+const controllerLogoutBtn = document.getElementById("controllerLogoutBtn");
+const adminStatus = document.getElementById("adminStatus");
 const teamsCount = document.getElementById("teamsCount");
 const activeQuestion = document.getElementById("activeQuestion");
 const leaderboardCount = document.getElementById("leaderboardCount");
@@ -18,14 +17,17 @@ function status(msg, type = "") {
   adminStatus.className = `status ${type}`.trim();
 }
 
-function setAdminAccess(isUnlocked) {
-  if (!adminProtected) return;
-  adminProtected.hidden = !isUnlocked;
+function redirectToAccess() {
+  window.location.replace("/admin.html");
+}
+
+if (!adminKey) {
+  redirectToAccess();
 }
 
 function lockRequired() {
   if (!adminKey) {
-    status("Login first.", "err");
+    redirectToAccess();
     return true;
   }
   return false;
@@ -90,12 +92,12 @@ function parseBatchQuestions(text) {
     if (parts.length < 4) continue;
 
     const correctIndex = Number(parts[parts.length - 1]);
-    const text = parts[0];
+    const prompt = parts[0];
     const options = parts.slice(1, -1);
 
-    if (!text || options.length < 2 || !Number.isInteger(correctIndex)) continue;
+    if (!prompt || options.length < 2 || !Number.isInteger(correctIndex)) continue;
 
-    questions.push({ text, options, correctIndex });
+    questions.push({ text: prompt, options, correctIndex });
   }
 
   return questions;
@@ -113,8 +115,8 @@ async function refreshOverview() {
     renderRows(
       teamsBox,
       data.latestTeams.map(
-        (t) =>
-          `<strong>${t.teamName}</strong> (${t.teamId})<br/><span class="muted">${t.department}</span><br/><button class="btn" type="button" data-delete-team="${t.teamId}" style="margin-top:8px;">Delete Team</button>`
+        (team) =>
+          `<strong>${team.teamName}</strong> (${team.teamId})<br/><span class="muted">${team.department}</span><br/><button class="btn" type="button" data-delete-team="${team.teamId}" style="margin-top:8px;">Delete Team</button>`
       ),
       "No registrations yet"
     );
@@ -126,58 +128,35 @@ async function refreshOverview() {
     renderRows(
       leaderboardBox,
       data.leaderboard.map(
-        (l, i) =>
-          `#${i + 1} <strong>${l.teamName || l.teamId}</strong> | Points: ${l.points} | Correct: ${l.correctCount}/${l.totalQuestions} | Time: ${Math.round(l.elapsedMs / 1000)}s`
+        (row, index) =>
+          `#${index + 1} <strong>${row.teamName || row.teamId}</strong> | Points: ${row.points} | Correct: ${row.correctCount}/${row.totalQuestions} | Time: ${Math.round(row.elapsedMs / 1000)}s`
       ),
       "No submissions yet"
     );
 
     renderRows(
       responsesBox,
-      data.responseBreakdown.map((r) => {
-        const answers = (r.answers || [])
+      data.responseBreakdown.map((row) => {
+        const answers = (row.answers || [])
           .map(
-            (a, idx) =>
-              `Q${idx + 1}: selected ${a.selectedIndex >= 0 ? a.selectedIndex : "-"}, correct ${a.correctIndex} -> <strong style=\"color:${a.isCorrect ? "#73ffa4" : "#ff7595"}\">${a.isCorrect ? "Correct" : "Wrong"}</strong>`
+            (answer, index) =>
+              `Q${index + 1}: selected ${answer.selectedIndex >= 0 ? answer.selectedIndex : "-"}, correct ${answer.correctIndex} -> <strong style="color:${answer.isCorrect ? "#73ffa4" : "#ff7595"}">${answer.isCorrect ? "Correct" : "Wrong"}</strong>`
           )
           .join("<br/>");
 
-        return `<strong>${r.teamName || r.teamId}</strong> (${r.teamId})<br/>Points: ${r.points} | Correct: ${r.correctCount}/${r.totalQuestions} | Time: ${Math.round(r.elapsedMs / 1000)}s<br/><span class="muted">${answers}</span>`;
+        return `<strong>${row.teamName || row.teamId}</strong> (${row.teamId})<br/>Points: ${row.points} | Correct: ${row.correctCount}/${row.totalQuestions} | Time: ${Math.round(row.elapsedMs / 1000)}s<br/><span class="muted">${answers}</span>`;
       }),
       "No team submissions yet"
     );
   } catch (error) {
+    if ((error.message || "").toLowerCase().includes("unauthorized")) {
+      sessionStorage.removeItem("mindforge_admin_key");
+      redirectToAccess();
+      return;
+    }
     status(error.message || "Unable to refresh overview", "err");
   }
 }
-
-adminLoginForm?.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const key = new FormData(adminLoginForm).get("key");
-  status("Authenticating controller key...");
-
-  try {
-    const response = await fetch("/api/admin-auth", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ key })
-    });
-
-    const result = await response.json();
-    if (!response.ok || !result.success) {
-      throw new Error(result.message || "Auth failed");
-    }
-
-    adminKey = key;
-    sessionStorage.setItem("mindforge_admin_key", adminKey);
-    setAdminAccess(true);
-    status("Controller access granted.", "ok");
-    refreshOverview();
-  } catch (error) {
-    setAdminAccess(false);
-    status(error.message || "Invalid key.", "err");
-  }
-});
 
 announcementForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -238,12 +217,11 @@ closeQuestionBtn?.addEventListener("click", async () => {
   }
 });
 
-if (adminKey) {
-  setAdminAccess(true);
-  status("Controller session restored.", "ok");
-  refreshOverview();
-} else {
-  setAdminAccess(false);
-}
+controllerLogoutBtn?.addEventListener("click", () => {
+  sessionStorage.removeItem("mindforge_admin_key");
+  redirectToAccess();
+});
 
+status("Controller session restored.", "ok");
+refreshOverview();
 setInterval(refreshOverview, 3000);
