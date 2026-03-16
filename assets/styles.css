@@ -433,6 +433,10 @@ body::before {
   width: 360px;
 }
 
+.ai-inline {
+  width: 220px;
+}
+
 .unstop-inline {
   width: 220px;
 }
@@ -887,6 +891,10 @@ input[type="checkbox"] {
   height: 42px;
 }
 
+.ai-footer-logo {
+  height: 52px;
+}
+
 .muted {
   color: var(--muted);
 }
@@ -988,6 +996,10 @@ input[type="checkbox"] {
 
   .cu-logo {
     width: 300px;
+  }
+
+  .ai-inline {
+    width: 190px;
   }
 
   .hero-logo-block {
@@ -1128,6 +1140,10 @@ input[type="checkbox"] {
 
   .cu-logo {
     width: min(100%, 290px);
+  }
+
+  .ai-inline {
+    width: min(100%, 180px);
   }
 
   .unstop-inline {
@@ -1300,8 +1316,16 @@ input[type="checkbox"] {
     width: min(100%, 250px);
   }
 
+  .ai-inline {
+    width: min(100%, 160px);
+  }
+
   .cu-footer-logo {
     height: 34px;
+  }
+
+  .ai-footer-logo {
+    height: 40px;
   }
 
   .time-block {
