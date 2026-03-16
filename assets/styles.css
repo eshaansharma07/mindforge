@@ -18,6 +18,24 @@
   --danger: #ff7595;
 }
 
+html[data-theme="light"] {
+  --bg-a: #eff6ff;
+  --bg-b: #f9fbff;
+  --bg-c: #dbe8ff;
+  --panel: rgba(255, 255, 255, 0.82);
+  --panel-soft: rgba(247, 250, 255, 0.86);
+  --line: rgba(59, 119, 200, 0.22);
+  --line-strong: rgba(0, 140, 200, 0.82);
+  --text: #13213f;
+  --muted: #62708d;
+  --cyan: #007ea7;
+  --blue: #5882ff;
+  --violet: #7559da;
+  --pink: #db3da0;
+  --ok: #1f9d63;
+  --danger: #c94d67;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -313,6 +331,14 @@ body::before {
   flex-wrap: wrap;
 }
 
+.nav-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
 .nav-links a {
   color: #d8e3ff;
   text-decoration: none;
@@ -323,6 +349,22 @@ body::before {
 
 .nav-links a:hover {
   color: var(--cyan);
+}
+
+.theme-toggle {
+  border: 1px solid var(--line-strong);
+  background: rgba(6, 11, 29, 0.55);
+  color: var(--cyan);
+  font-family: "Orbitron", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 10px 14px;
+  cursor: pointer;
+  min-width: 138px;
+}
+
+.theme-toggle:hover {
+  box-shadow: 0 0 0 3px rgba(40, 228, 255, 0.14);
 }
 
 .hero-main {
@@ -901,6 +943,136 @@ input[type="checkbox"] {
   color: var(--muted);
 }
 
+html[data-theme="light"] body {
+  background:
+    radial-gradient(1100px 620px at -12% 25%, rgba(118, 133, 255, 0.12), transparent 65%),
+    radial-gradient(820px 520px at 88% 76%, rgba(0, 161, 225, 0.12), transparent 68%),
+    linear-gradient(160deg, var(--bg-a), var(--bg-b) 42%, var(--bg-c));
+}
+
+html[data-theme="light"] body::before {
+  background-image:
+    linear-gradient(rgba(97, 127, 180, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(97, 127, 180, 0.14) 1px, transparent 1px);
+  opacity: 0.42;
+}
+
+html[data-theme="light"] .grid-glow {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(8, 34, 84, 0.03) 0,
+    rgba(8, 34, 84, 0.03) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  opacity: 0.18;
+}
+
+html[data-theme="light"] .loader-screen {
+  background:
+    radial-gradient(720px 420px at 18% 18%, rgba(0, 126, 167, 0.12), transparent 70%),
+    radial-gradient(860px 520px at 82% 78%, rgba(219, 61, 160, 0.1), transparent 68%),
+    linear-gradient(145deg, #edf5ff, #f8fbff 48%, #dbe8ff);
+}
+
+html[data-theme="light"] .loader-grid {
+  background-image:
+    linear-gradient(rgba(97, 127, 180, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(97, 127, 180, 0.12) 1px, transparent 1px);
+}
+
+html[data-theme="light"] .loader-kicker {
+  background: rgba(255, 255, 255, 0.62);
+}
+
+html[data-theme="light"] .loader-subtitle,
+html[data-theme="light"] .loader-foot,
+html[data-theme="light"] .loader-meta {
+  color: #1d2b48;
+}
+
+html[data-theme="light"] .loader-panel {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(237, 244, 255, 0.85)),
+    rgba(247, 250, 255, 0.92);
+  box-shadow:
+    0 18px 44px rgba(100, 128, 178, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+html[data-theme="light"] .loader-bar {
+  background: rgba(232, 241, 255, 0.96);
+}
+
+html[data-theme="light"] .page {
+  border-color: rgba(92, 137, 199, 0.24);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(244, 248, 255, 0.72));
+  box-shadow: 0 16px 40px rgba(73, 106, 158, 0.08);
+}
+
+html[data-theme="light"] .nav {
+  background: linear-gradient(95deg, rgba(255, 255, 255, 0.96), rgba(238, 244, 255, 0.92));
+  border-bottom-color: rgba(92, 137, 199, 0.22);
+}
+
+html[data-theme="light"] .nav-links a {
+  color: #20304f;
+}
+
+html[data-theme="light"] .theme-toggle {
+  background: rgba(255, 255, 255, 0.78);
+}
+
+html[data-theme="light"] .hero-sub {
+  color: #50617f;
+}
+
+html[data-theme="light"] .time-label,
+html[data-theme="light"] .section-title p,
+html[data-theme="light"] .event-card p,
+html[data-theme="light"] .rule p {
+  color: #5f6f8b;
+}
+
+html[data-theme="light"] .identity-card,
+html[data-theme="light"] .event-card,
+html[data-theme="light"] .register-wrap,
+html[data-theme="light"] .member-card,
+html[data-theme="light"] .card,
+html[data-theme="light"] .rule,
+html[data-theme="light"] .item,
+html[data-theme="light"] .opt {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(241, 246, 255, 0.84));
+  box-shadow: 0 12px 26px rgba(89, 118, 166, 0.08);
+}
+
+html[data-theme="light"] .item,
+html[data-theme="light"] .opt,
+html[data-theme="light"] .input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea {
+  border-color: rgba(79, 133, 201, 0.26);
+}
+
+html[data-theme="light"] .input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea {
+  background: rgba(255, 255, 255, 0.92);
+  color: #13213f;
+}
+
+html[data-theme="light"] .event-card::after {
+  background: #f8fbff;
+}
+
+html[data-theme="light"] .day-tag {
+  color: #ffffff;
+}
+
+html[data-theme="light"] .footer {
+  border-top-color: rgba(92, 137, 199, 0.22);
+}
+
 .reveal {
   animation: reveal 0.58s ease both;
 }
@@ -932,6 +1104,10 @@ input[type="checkbox"] {
 
   .nav-links {
     gap: 16px;
+  }
+
+  .nav-actions {
+    gap: 12px;
   }
 
   .nav-links a {
@@ -1065,6 +1241,12 @@ input[type="checkbox"] {
     gap: 10px 8px;
   }
 
+  .nav-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .nav-links a {
     display: block;
     text-align: center;
@@ -1072,6 +1254,11 @@ input[type="checkbox"] {
     border: 1px solid rgba(84, 140, 230, 0.22);
     background: rgba(6, 11, 29, 0.5);
     font-size: 0.78rem;
+  }
+
+  .theme-toggle {
+    width: 100%;
+    min-width: 0;
   }
 
   .content {

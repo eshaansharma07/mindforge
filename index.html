@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MIND FORGE 2026</title>
+  <script>
+    document.documentElement.dataset.theme = localStorage.getItem("mindforge_theme") || "dark";
+  </script>
   <link rel="stylesheet" href="/assets/styles.css" />
 </head>
 <body>
@@ -31,14 +34,17 @@
       <div class="brand">
         <span class="quick-brand">MING FORGE</span>
       </div>
-      <div class="nav-links">
-        <a href="#home">Home</a>
-        <a href="#about">About</a>
-        <a href="#events">Events</a>
-        <a href="#register">Register</a>
-        <a href="/candidate.html">Portal</a>
-        <a href="#rules">Rules</a>
-        <a href="#contact">Contact</a>
+      <div class="nav-actions">
+        <div class="nav-links">
+          <a href="#home">Home</a>
+          <a href="#about">About</a>
+          <a href="#events">Events</a>
+          <a href="#register">Register</a>
+          <a href="/candidate.html">Portal</a>
+          <a href="#rules">Rules</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">Light Mode</button>
       </div>
     </nav>
 
@@ -52,8 +58,10 @@
         <div class="identity-card">
           <span class="identity-label">Organized By</span>
           <img
-            class="identity-logo ai-inline"
+            class="identity-logo ai-inline theme-ai-logo"
             src="/assets/ai-alliance-cropped.svg"
+            data-logo-dark="/assets/ai-alliance-cropped.svg"
+            data-logo-light="/assets/ai-alliance-light.svg"
             alt="AI Alliance Logo"
           />
         </div>
@@ -245,7 +253,13 @@
           <div class="muted">Admin Controller: <a href="/admin.html" style="color:var(--cyan);text-decoration:none;">Open Dashboard</a></div>
         </div>
         <div class="footer-logos">
-          <img class="footer-logo ai-footer-logo" src="/assets/ai-alliance-cropped.svg" alt="AI Alliance Logo" />
+          <img
+            class="footer-logo ai-footer-logo theme-ai-logo"
+            src="/assets/ai-alliance-cropped.svg"
+            data-logo-dark="/assets/ai-alliance-cropped.svg"
+            data-logo-light="/assets/ai-alliance-light.svg"
+            alt="AI Alliance Logo"
+          />
           <img class="footer-logo cu-footer-logo" src="https://www.cuchd.in/about/assets/images/cu-logo.png" alt="Chandigarh University Logo" />
           <img class="footer-logo" src="/assets/unstop-logo.svg" alt="Unstop Logo" />
         </div>
@@ -253,6 +267,7 @@
     </section>
   </main>
 
+  <script src="/scripts/theme.js"></script>
   <script src="/scripts/index.js"></script>
 </body>
 </html>
