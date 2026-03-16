@@ -34,8 +34,8 @@
         <p>Launch multiple questions as one 60-second set and evaluate each team by correctness and points.</p>
       </header>
 
-      <section class="section reveal">
-        <article class="register-wrap">
+      <section class="admin-access reveal">
+        <article class="register-wrap admin-access-card">
           <h3>Controller Login</h3>
           <form id="adminLoginForm">
             <label>Controller Key</label>
@@ -44,7 +44,10 @@
             <p id="adminStatus" class="status"></p>
           </form>
         </article>
+      </section>
 
+      <div id="adminProtected" class="admin-protected" hidden>
+      <section class="section reveal">
         <article class="card">
           <h3>Overview</h3>
           <div class="count-row" style="gap:22px;justify-content:flex-start;">
@@ -131,6 +134,7 @@
           <img class="footer-logo" src="/assets/unstop-logo.svg" alt="Unstop Logo" />
         </div>
       </footer>
+      </div>
     </section>
   </main>
 

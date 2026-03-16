@@ -901,6 +901,20 @@ input[type="checkbox"] {
   margin-top: 16px;
 }
 
+.admin-access {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.admin-access-card {
+  width: min(560px, 100%);
+}
+
+.admin-protected[hidden] {
+  display: none !important;
+}
+
 .card {
   border: 1px solid var(--line);
   background: var(--panel-soft);

@@ -1,5 +1,6 @@
 const adminLoginForm = document.getElementById("adminLoginForm");
 const adminStatus = document.getElementById("adminStatus");
+const adminProtected = document.getElementById("adminProtected");
 const announcementForm = document.getElementById("announcementForm");
 const questionForm = document.getElementById("questionForm");
 const closeQuestionBtn = document.getElementById("closeQuestionBtn");
@@ -15,6 +16,11 @@ let adminKey = sessionStorage.getItem("mindforge_admin_key") || "";
 function status(msg, type = "") {
   adminStatus.textContent = msg;
   adminStatus.className = `status ${type}`.trim();
+}
+
+function setAdminAccess(isUnlocked) {
+  if (!adminProtected) return;
+  adminProtected.hidden = !isUnlocked;
 }
 
 function lockRequired() {
@@ -164,9 +170,11 @@ adminLoginForm?.addEventListener("submit", async (event) => {
 
     adminKey = key;
     sessionStorage.setItem("mindforge_admin_key", adminKey);
+    setAdminAccess(true);
     status("Controller access granted.", "ok");
     refreshOverview();
   } catch (error) {
+    setAdminAccess(false);
     status(error.message || "Invalid key.", "err");
   }
 });
@@ -231,8 +239,11 @@ closeQuestionBtn?.addEventListener("click", async () => {
 });
 
 if (adminKey) {
+  setAdminAccess(true);
   status("Controller session restored.", "ok");
   refreshOverview();
+} else {
+  setAdminAccess(false);
 }
 
 setInterval(refreshOverview, 3000);
