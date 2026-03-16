@@ -19,6 +19,8 @@ const leaderboardStatus = document.getElementById("leaderboardStatus");
 
 let adminKey = sessionStorage.getItem("mindforge_admin_key") || "";
 let sourceSetId = null;
+let latestComputedLeaderboard = [];
+let leaderboardEditorDirty = false;
 
 function status(msg, type = "") {
   adminStatus.textContent = msg;
@@ -178,14 +180,26 @@ function parseLeaderboardEntries(text) {
     .filter(Boolean);
 }
 
+function getLeaderboardEntriesForAction(action) {
+  if (action === "hide" || action === "reset") {
+    return [];
+  }
+
+  const manualEntries = parseLeaderboardEntries(leaderboardEditor?.value || "");
+  if (manualEntries.length > 0) {
+    return manualEntries;
+  }
+
+  return Array.isArray(latestComputedLeaderboard) ? latestComputedLeaderboard : [];
+}
+
 async function updatePublicLeaderboard(action) {
   if (lockRequired()) return;
 
-  let entries = [];
+  const entries = getLeaderboardEntriesForAction(action);
   if (action !== "hide" && action !== "reset") {
-    entries = parseLeaderboardEntries(leaderboardEditor?.value || "");
     if (entries.length === 0) {
-      leaderboardMessage("Add at least one valid leaderboard row before updating.", "err");
+      leaderboardMessage("No leaderboard data is available yet. Wait for submissions first.", "err");
       return;
     }
   }
@@ -207,6 +221,7 @@ async function updatePublicLeaderboard(action) {
 
   try {
     await api("/api/admin-action", "POST", { action: "leaderboard", mode: action, entries });
+    leaderboardEditorDirty = false;
     leaderboardMessage(
       action === "show"
         ? "Leaderboard is now visible on the candidate portal."
@@ -229,6 +244,7 @@ async function refreshOverview() {
   try {
     const data = await api("/api/admin-overview");
     sourceSetId = data.sourceSetId || null;
+    latestComputedLeaderboard = Array.isArray(data.leaderboard) ? data.leaderboard : [];
     teamsCount.textContent = String(data.teamsCount);
     activeQuestion.textContent = data.activeSet ? "Yes" : "No";
     leaderboardCount.textContent = String(data.leaderboard.length);
@@ -255,10 +271,11 @@ async function refreshOverview() {
       "No submissions yet"
     );
 
-    const publicEntries = Array.isArray(data.leaderboardState?.entries)
-      ? data.leaderboardState.entries
-      : data.leaderboard;
-    if (leaderboardEditor) {
+    const publicEntries =
+      Array.isArray(data.leaderboardState?.entries) && data.leaderboardState.entries.length > 0
+        ? data.leaderboardState.entries
+        : latestComputedLeaderboard;
+    if (leaderboardEditor && document.activeElement !== leaderboardEditor && !leaderboardEditorDirty) {
       leaderboardEditor.value = serializeLeaderboardEntries(publicEntries);
     }
     leaderboardMessage(
@@ -373,6 +390,9 @@ closeQuestionBtn?.addEventListener("click", async () => {
 controllerLogoutBtn?.addEventListener("click", () => {
   sessionStorage.removeItem("mindforge_admin_key");
   redirectToAccess();
+});
+leaderboardEditor?.addEventListener("input", () => {
+  leaderboardEditorDirty = true;
 });
 showLeaderboardBtn?.addEventListener("click", () => updatePublicLeaderboard("show"));
 saveLeaderboardBtn?.addEventListener("click", () => updatePublicLeaderboard("save"));
