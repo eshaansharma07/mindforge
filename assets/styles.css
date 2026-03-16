@@ -868,6 +868,11 @@ textarea {
   resize: vertical;
 }
 
+#leaderboardEditor {
+  min-height: 180px;
+  margin-top: 8px;
+}
+
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;

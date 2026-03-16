@@ -2,6 +2,7 @@ const loginForm = document.getElementById("candidateLoginForm");
 const loginStatus = document.getElementById("loginStatus");
 const teamBox = document.getElementById("teamBox");
 const announcementBox = document.getElementById("announcementBox");
+const leaderboardPublicBox = document.getElementById("leaderboardPublicBox");
 const questionText = document.getElementById("questionText");
 const optionsBox = document.getElementById("optionsBox");
 const answerStatus = document.getElementById("answerStatus");
@@ -37,6 +38,7 @@ function clearCandidateAccess() {
   if (loginForm) loginForm.reset();
   teamBox.innerHTML = "";
   announcementBox.innerHTML = "";
+  leaderboardPublicBox.innerHTML = "";
   optionsBox.innerHTML = "";
   questionText.textContent = "No active question set yet.";
   questionText.className = "item muted";
@@ -209,6 +211,20 @@ async function loadState() {
       result.announcements.map((a) => `<strong>${a.title}</strong><br/>${a.body}`),
       "No announcements yet"
     );
+
+    const publicLeaderboard = result.publicLeaderboard;
+    if (publicLeaderboard?.isVisible && (publicLeaderboard.entries || []).length > 0) {
+      renderList(
+        leaderboardPublicBox,
+        publicLeaderboard.entries.map(
+          (entry, index) =>
+            `#${index + 1} <strong>${entry.teamName || entry.teamId}</strong> (${entry.teamId})<br/>Points: ${entry.points} | Correct: ${entry.correctCount}/${entry.totalQuestions} | Time: ${Math.round(entry.elapsedMs / 1000)}s`
+        ),
+        "Leaderboard not available"
+      );
+    } else {
+      renderList(leaderboardPublicBox, [], "Leaderboard will appear here when published by the controller.");
+    }
 
     const set = result.activeSet;
     if (!set) {

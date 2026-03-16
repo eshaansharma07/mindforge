@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
   try {
     const db = await getDb();
 
-    const [teamsCount, latestTeams, activeSetRaw, latestAnnouncementsRaw] = await Promise.all([
+    const [teamsCount, latestTeams, activeSetRaw, latestSetRaw, latestAnnouncementsRaw, leaderboardState] = await Promise.all([
       db.collection("teams").countDocuments(),
       db.collection("teams")
         .find({}, { projection: { _id: 0, teamId: 1, teamName: 1, department: 1, createdAt: 1 } })
@@ -16,7 +16,9 @@ module.exports = async (req, res) => {
         .limit(8)
         .toArray(),
       db.collection("quiz_sets").findOne({ isActive: true }),
-      db.collection("announcements").find({}).sort({ createdAt: -1 }).limit(8).toArray()
+      db.collection("quiz_sets").find({}).sort({ createdAt: -1 }).limit(1).next(),
+      db.collection("announcements").find({}).sort({ createdAt: -1 }).limit(8).toArray(),
+      db.collection("leaderboard_state").findOne({ key: "public" })
     ]);
 
     const latestAnnouncements = latestAnnouncementsRaw.map((announcement) => ({
@@ -26,6 +28,8 @@ module.exports = async (req, res) => {
       type: announcement.type,
       createdAt: announcement.createdAt
     }));
+
+    const sourceSet = activeSetRaw || latestSetRaw || null;
 
     let activeSet = null;
     let leaderboard = [];
@@ -47,10 +51,13 @@ module.exports = async (req, res) => {
         }))
       };
 
+    }
+
+    if (sourceSet) {
       leaderboard = await db
         .collection("quiz_responses")
         .aggregate([
-          { $match: { setId: activeSetRaw.setId } },
+          { $match: { setId: sourceSet.setId } },
           { $sort: { points: -1, elapsedMs: 1 } },
           {
             $lookup: {
@@ -99,6 +106,10 @@ module.exports = async (req, res) => {
       activeSet,
       latestAnnouncements,
       leaderboard,
+      leaderboardState: {
+        isVisible: Boolean(leaderboardState?.isVisible),
+        entries: Array.isArray(leaderboardState?.entries) ? leaderboardState.entries : []
+      },
       responseBreakdown
     });
   } catch (error) {

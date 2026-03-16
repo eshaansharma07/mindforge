@@ -40,12 +40,15 @@ module.exports = async (req, res) => {
       return send(res, 404, { success: false, message: "Team not found." });
     }
 
-    const announcements = await db
+    const [announcements, leaderboardState] = await Promise.all([
+      db
       .collection("announcements")
       .find({}, { projection: { _id: 0 } })
       .sort({ createdAt: -1 })
       .limit(8)
-      .toArray();
+      .toArray(),
+      db.collection("leaderboard_state").findOne({ key: "public" })
+    ]);
 
     const activeSetRaw = await db.collection("quiz_sets").findOne({ isActive: true });
     const activeSet = activeSetRaw
@@ -89,6 +92,10 @@ module.exports = async (req, res) => {
       activeSet,
       hasSubmitted,
       submission,
+      publicLeaderboard: {
+        isVisible: Boolean(leaderboardState?.isVisible),
+        entries: Array.isArray(leaderboardState?.entries) ? leaderboardState.entries : []
+      },
       now: new Date().toISOString()
     });
   } catch (error) {

@@ -10,12 +10,23 @@ const teamsBox = document.getElementById("teamsBox");
 const leaderboardBox = document.getElementById("leaderboardBox");
 const responsesBox = document.getElementById("responsesBox");
 const announcementsBox = document.getElementById("announcementsBox");
+const leaderboardEditor = document.getElementById("leaderboardEditor");
+const showLeaderboardBtn = document.getElementById("showLeaderboardBtn");
+const saveLeaderboardBtn = document.getElementById("saveLeaderboardBtn");
+const hideLeaderboardBtn = document.getElementById("hideLeaderboardBtn");
+const leaderboardStatus = document.getElementById("leaderboardStatus");
 
 let adminKey = sessionStorage.getItem("mindforge_admin_key") || "";
 
 function status(msg, type = "") {
   adminStatus.textContent = msg;
   adminStatus.className = `status ${type}`.trim();
+}
+
+function leaderboardMessage(msg, type = "") {
+  if (!leaderboardStatus) return;
+  leaderboardStatus.textContent = msg;
+  leaderboardStatus.className = `status ${type}`.trim();
 }
 
 function redirectToAccess() {
@@ -118,6 +129,67 @@ function parseBatchQuestions(text) {
   return questions;
 }
 
+function serializeLeaderboardEntries(entries) {
+  return (entries || [])
+    .map(
+      (entry) =>
+        `${entry.teamId || ""} || ${entry.teamName || ""} || ${Number(entry.points || 0)} || ${Number(entry.correctCount || 0)} || ${Number(entry.totalQuestions || 0)} || ${Math.round(Number(entry.elapsedMs || 0) / 1000)}`
+    )
+    .join("\n");
+}
+
+function parseLeaderboardEntries(text) {
+  return String(text || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const parts = line.split("||").map((part) => part.trim());
+      if (parts.length < 6) return null;
+      return {
+        teamId: parts[0].toUpperCase(),
+        teamName: parts[1],
+        points: Number(parts[2] || 0),
+        correctCount: Number(parts[3] || 0),
+        totalQuestions: Number(parts[4] || 0),
+        elapsedMs: Math.max(0, Number(parts[5] || 0) * 1000)
+      };
+    })
+    .filter(Boolean);
+}
+
+async function updatePublicLeaderboard(action) {
+  if (lockRequired()) return;
+
+  let entries = [];
+  if (action !== "hide") {
+    entries = parseLeaderboardEntries(leaderboardEditor?.value || "");
+    if (entries.length === 0) {
+      leaderboardMessage("Add at least one valid leaderboard row before updating.", "err");
+      return;
+    }
+  }
+
+  leaderboardMessage(
+    action === "show" ? "Publishing leaderboard..." : action === "save" ? "Saving leaderboard edits..." : "Hiding leaderboard..."
+  );
+
+  try {
+    await api("/api/admin-leaderboard", "POST", { action, entries });
+    leaderboardMessage(
+      action === "show"
+        ? "Leaderboard is now visible on the candidate portal."
+        : action === "save"
+          ? "Leaderboard edits saved."
+          : "Leaderboard hidden from the candidate portal.",
+      "ok"
+    );
+    refreshOverview();
+  } catch (error) {
+    leaderboardMessage(error.message || "Could not update leaderboard.", "err");
+  }
+}
+
 async function refreshOverview() {
   if (!adminKey) return;
 
@@ -147,6 +219,20 @@ async function refreshOverview() {
           `#${index + 1} <strong>${row.teamName || row.teamId}</strong> | Points: ${row.points} | Correct: ${row.correctCount}/${row.totalQuestions} | Time: ${Math.round(row.elapsedMs / 1000)}s`
       ),
       "No submissions yet"
+    );
+
+    const publicEntries =
+      data.leaderboardState && data.leaderboardState.entries && data.leaderboardState.entries.length > 0
+        ? data.leaderboardState.entries
+        : data.leaderboard;
+    if (leaderboardEditor) {
+      leaderboardEditor.value = serializeLeaderboardEntries(publicEntries);
+    }
+    leaderboardMessage(
+      data.leaderboardState?.isVisible
+        ? "Leaderboard is currently visible on the candidate portal."
+        : "Leaderboard is currently hidden from the candidate portal.",
+      data.leaderboardState?.isVisible ? "ok" : ""
     );
 
     renderRows(
@@ -251,6 +337,9 @@ controllerLogoutBtn?.addEventListener("click", () => {
   sessionStorage.removeItem("mindforge_admin_key");
   redirectToAccess();
 });
+showLeaderboardBtn?.addEventListener("click", () => updatePublicLeaderboard("show"));
+saveLeaderboardBtn?.addEventListener("click", () => updatePublicLeaderboard("save"));
+hideLeaderboardBtn?.addEventListener("click", () => updatePublicLeaderboard("hide"));
 
 status("Controller session restored.", "ok");
 refreshOverview();
