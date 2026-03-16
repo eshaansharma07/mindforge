@@ -109,6 +109,7 @@ module.exports = async (req, res) => {
       leaderboard,
       leaderboardState: {
         isVisible: Boolean(leaderboardState?.isVisible),
+        isReset: Boolean(leaderboardState?.isReset),
         entries: Array.isArray(leaderboardState?.entries) ? leaderboardState.entries : []
       },
       responseBreakdown

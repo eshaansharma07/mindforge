@@ -245,9 +245,10 @@ async function refreshOverview() {
     const data = await api("/api/admin-overview");
     sourceSetId = data.sourceSetId || null;
     latestComputedLeaderboard = Array.isArray(data.leaderboard) ? data.leaderboard : [];
+    const leaderboardWasReset = Boolean(data.leaderboardState?.isReset);
     teamsCount.textContent = String(data.teamsCount);
     activeQuestion.textContent = data.activeSet ? "Yes" : "No";
-    leaderboardCount.textContent = String(data.leaderboard.length);
+    leaderboardCount.textContent = String(leaderboardWasReset ? 0 : data.leaderboard.length);
 
     renderRows(
       teamsBox,
@@ -264,25 +265,31 @@ async function refreshOverview() {
 
     renderRows(
       leaderboardBox,
-      data.leaderboard.map(
-        (row, index) =>
-          `#${index + 1} <strong>${row.teamName || row.teamId}</strong> | Points: ${row.points} | Correct: ${row.correctCount}/${row.totalQuestions} | Time: ${Math.round(row.elapsedMs / 1000)}s`
-      ),
-      "No submissions yet"
+      leaderboardWasReset
+        ? []
+        : data.leaderboard.map(
+            (row, index) =>
+              `#${index + 1} <strong>${row.teamName || row.teamId}</strong> | Points: ${row.points} | Correct: ${row.correctCount}/${row.totalQuestions} | Time: ${Math.round(row.elapsedMs / 1000)}s`
+          ),
+      leaderboardWasReset ? "Leaderboard reset. No data shown." : "No submissions yet"
     );
 
     const publicEntries =
-      Array.isArray(data.leaderboardState?.entries) && data.leaderboardState.entries.length > 0
+      leaderboardWasReset
+        ? []
+        : Array.isArray(data.leaderboardState?.entries) && data.leaderboardState.entries.length > 0
         ? data.leaderboardState.entries
         : latestComputedLeaderboard;
     if (leaderboardEditor && document.activeElement !== leaderboardEditor && !leaderboardEditorDirty) {
       leaderboardEditor.value = serializeLeaderboardEntries(publicEntries);
     }
     leaderboardMessage(
-      data.leaderboardState?.isVisible
+      leaderboardWasReset
+        ? "Leaderboard has been reset. Publish or save to generate it again."
+        : data.leaderboardState?.isVisible
         ? "Leaderboard is currently visible on the candidate portal."
         : "Leaderboard is currently hidden from the candidate portal.",
-      data.leaderboardState?.isVisible ? "ok" : ""
+      leaderboardWasReset ? "" : data.leaderboardState?.isVisible ? "ok" : ""
     );
 
     renderRows(

@@ -219,6 +219,7 @@ module.exports = async (req, res) => {
             $set: {
               key: "public",
               isVisible: false,
+              isReset: false,
               updatedAt: new Date()
             }
           },
@@ -235,6 +236,7 @@ module.exports = async (req, res) => {
             $set: {
               key: "public",
               isVisible: false,
+              isReset: true,
               entries: [],
               updatedAt: new Date()
             }
@@ -256,6 +258,7 @@ module.exports = async (req, res) => {
           $set: {
             key: "public",
             isVisible: mode === "show",
+            isReset: false,
             entries,
             updatedAt: new Date()
           }
