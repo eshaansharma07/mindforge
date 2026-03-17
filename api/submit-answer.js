@@ -28,7 +28,11 @@ module.exports = async (req, res) => {
 
     const [team, set] = await Promise.all([
       db.collection("teams").findOne({ teamId }),
-      db.collection("quiz_sets").findOne({ setId, isActive: true })
+      db.collection("quiz_sets").findOne({
+        setId,
+        isActive: true,
+        endAt: { $gt: new Date() }
+      })
     ]);
 
     if (!team) {

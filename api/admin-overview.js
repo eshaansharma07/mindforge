@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
   try {
     const db = await getDb();
 
-    const [teamsCount, latestTeams, activeSetRaw, latestSetRaw, latestAnnouncementsRaw, leaderboardState] = await Promise.all([
+    const [teamsCount, latestTeams, activeSetFound, latestSetRaw, latestAnnouncementsRaw, leaderboardState] = await Promise.all([
       db.collection("teams").countDocuments(),
       db.collection("teams")
         .find({}, { projection: { _id: 0, teamId: 1, teamName: 1, department: 1, createdAt: 1 } })
@@ -20,6 +20,15 @@ module.exports = async (req, res) => {
       db.collection("announcements").find({}).sort({ createdAt: -1 }).limit(8).toArray(),
       db.collection("leaderboard_state").findOne({ key: "public" })
     ]);
+
+    let activeSetRaw = activeSetFound;
+    if (activeSetRaw && new Date(activeSetRaw.endAt).getTime() <= Date.now()) {
+      await db.collection("quiz_sets").updateOne(
+        { _id: activeSetRaw._id },
+        { $set: { isActive: false } }
+      );
+      activeSetRaw = null;
+    }
 
     const latestAnnouncements = latestAnnouncementsRaw.map((announcement) => ({
       announcementId: String(announcement._id),

@@ -50,7 +50,15 @@ module.exports = async (req, res) => {
       db.collection("leaderboard_state").findOne({ key: "public" })
     ]);
 
-    const activeSetRaw = await db.collection("quiz_sets").findOne({ isActive: true });
+    let activeSetRaw = await db.collection("quiz_sets").findOne({ isActive: true });
+    if (activeSetRaw && new Date(activeSetRaw.endAt).getTime() <= Date.now()) {
+      await db.collection("quiz_sets").updateOne(
+        { _id: activeSetRaw._id },
+        { $set: { isActive: false } }
+      );
+      activeSetRaw = null;
+    }
+
     const activeSet = activeSetRaw
       ? {
           setId: activeSetRaw.setId,
