@@ -102,6 +102,9 @@ module.exports = async (req, res) => {
       elapsedMs
     });
   } catch (error) {
+    if (error && error.code === 11000) {
+      return send(res, 409, { success: false, message: "Answers already submitted." });
+    }
     return send(res, 500, { success: false, message: error.message || "Failed to submit answers" });
   }
 };

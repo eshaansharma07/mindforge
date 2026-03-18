@@ -2,6 +2,7 @@ const { MongoClient } = require("mongodb");
 
 let client;
 let clientPromise;
+let indexesPromise;
 
 function getConfig() {
   const uri = process.env.MONGODB_URI;
@@ -23,7 +24,24 @@ async function getDb() {
   }
 
   const connected = await clientPromise;
-  return connected.db(dbName);
+  const db = connected.db(dbName);
+
+  if (!indexesPromise) {
+    indexesPromise = Promise.all([
+      db.collection("teams").createIndex({ teamId: 1 }, { unique: true }),
+      db.collection("candidate_sessions").createIndex({ teamId: 1 }, { unique: true }),
+      db.collection("quiz_responses").createIndex({ setId: 1, teamId: 1 }, { unique: true }),
+      db.collection("quiz_sets").createIndex({ isActive: 1, endAt: 1 }),
+      db.collection("announcements").createIndex({ createdAt: -1 }),
+      db.collection("leaderboard_state").createIndex({ key: 1 }, { unique: true })
+    ]).catch((error) => {
+      indexesPromise = null;
+      throw error;
+    });
+  }
+
+  await indexesPromise;
+  return db;
 }
 
 module.exports = { getDb };

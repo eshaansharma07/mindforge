@@ -1,4 +1,5 @@
 const SESSION_TTL_MS = 90 * 1000;
+const SESSION_TOUCH_INTERVAL_MS = 15 * 1000;
 
 function normalizeToken(value) {
   return String(value || "").trim();
@@ -45,16 +46,20 @@ async function validateCandidateSession(db, teamId, sessionToken) {
     return { ok: false, code: 409, message: "This team is already logged in on another device." };
   }
 
-  await db.collection("candidate_sessions").updateOne(
-    { teamId, sessionToken: token },
-    { $set: { lastSeenAt: new Date().toISOString() } }
-  );
+  const lastSeen = new Date(existing.lastSeenAt).getTime();
+  if (!Number.isFinite(lastSeen) || Date.now() - lastSeen >= SESSION_TOUCH_INTERVAL_MS) {
+    await db.collection("candidate_sessions").updateOne(
+      { teamId, sessionToken: token },
+      { $set: { lastSeenAt: new Date().toISOString() } }
+    );
+  }
 
   return { ok: true };
 }
 
 module.exports = {
   SESSION_TTL_MS,
+  SESSION_TOUCH_INTERVAL_MS,
   normalizeToken,
   sessionExpired,
   getSession,

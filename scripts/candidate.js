@@ -17,6 +17,24 @@ let selectedAnswers = {};
 let renderedSetId = null;
 let timer;
 let autoSubmitting = false;
+let stateRequestInFlight = false;
+let pollTimeout = null;
+
+const ACTIVE_POLL_MS = 5000;
+const IDLE_POLL_MS = 4000;
+const ERROR_POLL_MS = 8000;
+
+function nextPollDelay(hasActiveSet, hadError = false) {
+  const base = hadError ? ERROR_POLL_MS : hasActiveSet ? ACTIVE_POLL_MS : IDLE_POLL_MS;
+  return base + Math.floor(Math.random() * 700);
+}
+
+function queueNextLoad(hasActiveSet = Boolean(activeSetId), hadError = false) {
+  clearTimeout(pollTimeout);
+  pollTimeout = setTimeout(() => {
+    loadState();
+  }, nextPollDelay(hasActiveSet, hadError));
+}
 
 function getOrCreateSessionToken() {
   if (activeSessionToken) return activeSessionToken;
@@ -34,6 +52,7 @@ function clearCandidateAccess() {
   renderedSetId = null;
   selectedAnswers = {};
   clearInterval(timer);
+  clearTimeout(pollTimeout);
   localStorage.removeItem("mindforge_team_id");
   localStorage.removeItem("mindforge_session_token");
   if (loginForm) loginForm.reset();
@@ -243,6 +262,9 @@ async function submitAllAnswers({ force = false, auto = false } = {}) {
 
 async function loadState() {
   if (!activeTeamId || !activeSessionToken) return;
+  if (stateRequestInFlight) return;
+
+  stateRequestInFlight = true;
 
   try {
     const response = await fetch(`/api/candidate-state?teamId=${encodeURIComponent(activeTeamId)}`, {
@@ -295,6 +317,7 @@ async function loadState() {
       optionsBox.innerHTML = "";
       countdownEl.textContent = "--";
       submitSetBtn.style.display = "none";
+      queueNextLoad(false, false);
       return;
     }
 
@@ -313,6 +336,7 @@ async function loadState() {
         `Already submitted. Correct: ${s.correctCount}/${s.totalQuestions} | Points: ${s.points} | Time: ${Math.round(s.elapsedMs / 1000)}s`,
         "ok"
       );
+      queueNextLoad(true, false);
       return;
     }
 
@@ -326,6 +350,7 @@ async function loadState() {
     }
     submitSetBtn.style.display = "inline-block";
     setStatus(answerStatus, "Select answers for all questions and click Submit All Answers.", "");
+    queueNextLoad(true, false);
   } catch (error) {
     const message = error.message || "Failed to load state.";
     if (
@@ -334,8 +359,12 @@ async function loadState() {
       message.includes("session is required")
     ) {
       clearCandidateAccess();
+      return;
     }
     setStatus(loginStatus, message, "err");
+    queueNextLoad(Boolean(activeSetId), true);
+  } finally {
+    stateRequestInFlight = false;
   }
 }
 
@@ -411,8 +440,6 @@ if (activeTeamId && activeSessionToken) {
 } else if (activeTeamId || activeSessionToken) {
   clearCandidateAccess();
 }
-
-setInterval(loadState, 3000);
 
 document.addEventListener("visibilitychange", () => {
   if (
