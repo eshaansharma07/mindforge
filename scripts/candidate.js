@@ -248,8 +248,8 @@ async function submitAllAnswers({ force = false, auto = false } = {}) {
     setStatus(
       answerStatus,
       auto
-        ? `Auto-submitted. Correct: ${result.correctCount}/${result.totalQuestions} | Points: ${result.points} | Time: ${Math.round(result.elapsedMs / 1000)}s`
-        : `Submitted. Correct: ${result.correctCount}/${result.totalQuestions} | Points: ${result.points} | Time: ${Math.round(result.elapsedMs / 1000)}s`,
+        ? "Auto-submitted successfully."
+        : "Submitted successfully.",
       "ok"
     );
 
@@ -333,7 +333,7 @@ async function loadState() {
       const s = result.submission;
       setStatus(
         answerStatus,
-        `Already submitted. Correct: ${s.correctCount}/${s.totalQuestions} | Points: ${s.points} | Time: ${Math.round(s.elapsedMs / 1000)}s`,
+        "You have already submitted your answers. Please wait for further updates from the controller.",
         "ok"
       );
       queueNextLoad(true, false);

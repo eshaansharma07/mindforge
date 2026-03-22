@@ -255,8 +255,8 @@ async function submitCodingRound({ force = false, auto = false } = {}) {
     setStatus(
       answerStatus,
       auto
-        ? `Auto-submitted. Correct: ${result.correctCount}/${result.totalCases} | Points: ${result.totalPoints} | Time: ${Math.round(result.elapsedMs / 1000)}s`
-        : `Submitted. Correct: ${result.correctCount}/${result.totalCases} | Points: ${result.totalPoints} | Time: ${Math.round(result.elapsedMs / 1000)}s`,
+        ? "Auto-submitted successfully."
+        : "Submitted successfully.",
       "ok"
     );
     submitBtn.style.display = "none";
@@ -328,18 +328,9 @@ async function loadState() {
       problemBody.innerHTML = "";
       renderedRoundId = null;
       submitBtn.style.display = "none";
-      const submission = result.submission;
-      renderList(
-        problemBody,
-        (submission.evaluatedCases || []).map(
-          (item) =>
-            `<strong>${item.label}</strong> | <span style="color:${item.isCorrect ? "var(--ok)" : "var(--danger)"}">${item.isCorrect ? "Correct" : "Wrong"}</span> | ${item.points} pts`
-        ),
-        "No testcase analysis available."
-      );
       setStatus(
         answerStatus,
-        `Already submitted. Correct: ${submission.correctCount}/${submission.totalCases} | Points: ${submission.totalPoints} | Time: ${Math.round(submission.elapsedMs / 1000)}s`,
+        "You have already submitted your coding round response. Please wait for further updates from the controller.",
         "ok"
       );
       queueNextLoad(true, false);
