@@ -16,11 +16,19 @@ const saveLeaderboardBtn = document.getElementById("saveLeaderboardBtn");
 const hideLeaderboardBtn = document.getElementById("hideLeaderboardBtn");
 const resetLeaderboardBtn = document.getElementById("resetLeaderboardBtn");
 const leaderboardStatus = document.getElementById("leaderboardStatus");
+const judgeTeamSelect = document.getElementById("judgeTeamSelect");
+const judgeVerdictSelect = document.getElementById("judgeVerdictSelect");
+const judgeNameInput = document.getElementById("judgeNameInput");
+const judgeCommentsInput = document.getElementById("judgeCommentsInput");
+const saveJudgeVerdictBtn = document.getElementById("saveJudgeVerdictBtn");
+const judgeVerdictStatus = document.getElementById("judgeVerdictStatus");
+const judgeVerdictBox = document.getElementById("judgeVerdictBox");
 
 let adminKey = sessionStorage.getItem("mindforge_admin_key") || "";
 let sourceSetId = null;
 let latestComputedLeaderboard = [];
 let leaderboardEditorDirty = false;
+let latestJudgeVerdicts = [];
 let overviewRequestInFlight = false;
 let overviewPollTimeout = null;
 
@@ -49,6 +57,12 @@ function leaderboardMessage(msg, type = "") {
   if (!leaderboardStatus) return;
   leaderboardStatus.textContent = msg;
   leaderboardStatus.className = `status ${type}`.trim();
+}
+
+function judgeStatus(msg, type = "") {
+  if (!judgeVerdictStatus) return;
+  judgeVerdictStatus.textContent = msg;
+  judgeVerdictStatus.className = `status ${type}`.trim();
 }
 
 function redirectToAccess() {
@@ -143,6 +157,66 @@ function renderRows(container, rows, empty = "No data") {
     div.innerHTML = html;
     container.appendChild(div);
   });
+}
+
+function syncJudgeTeamOptions(responseRows) {
+  if (!judgeTeamSelect) return;
+
+  const rows = Array.isArray(responseRows) ? responseRows : [];
+  const selectedValue = judgeTeamSelect.value || "";
+  judgeTeamSelect.innerHTML = [
+    `<option value="">Select Team</option>`,
+    ...rows.map(
+      (row) =>
+        `<option value="${row.teamId}">${row.teamName || row.teamId} (${row.teamId})</option>`
+    )
+  ].join("");
+
+  const stillExists = rows.some((row) => row.teamId === selectedValue);
+  judgeTeamSelect.value = stillExists ? selectedValue : "";
+  fillJudgeForm();
+}
+
+function fillJudgeForm() {
+  const teamId = judgeTeamSelect?.value || "";
+  if (!teamId) {
+    if (judgeVerdictSelect) judgeVerdictSelect.value = "Approved";
+    if (judgeNameInput) judgeNameInput.value = "";
+    if (judgeCommentsInput) judgeCommentsInput.value = "";
+    return;
+  }
+
+  const existing = latestJudgeVerdicts.find((item) => item.teamId === teamId);
+  if (judgeVerdictSelect) judgeVerdictSelect.value = existing?.verdict || "Approved";
+  if (judgeNameInput) judgeNameInput.value = existing?.judgeName || "";
+  if (judgeCommentsInput) judgeCommentsInput.value = existing?.comments || "";
+}
+
+async function saveJudgeVerdict() {
+  if (lockRequired()) return;
+  const teamId = judgeTeamSelect?.value || "";
+
+  if (!sourceSetId || !teamId) {
+    judgeStatus("Select a team submission before saving a verdict.", "err");
+    return;
+  }
+
+  judgeStatus("Saving judge verdict...");
+
+  try {
+    await api("/api/admin-action", "POST", {
+      action: "saveJudgeVerdict",
+      setId: sourceSetId,
+      teamId,
+      verdict: judgeVerdictSelect?.value || "Approved",
+      judgeName: judgeNameInput?.value || "",
+      comments: judgeCommentsInput?.value || ""
+    });
+    judgeStatus(`Verdict saved for ${teamId}.`, "ok");
+    refreshOverview();
+  } catch (error) {
+    judgeStatus(error.message || "Could not save judge verdict.", "err");
+  }
 }
 
 function parseBatchQuestions(text) {
@@ -344,6 +418,17 @@ async function refreshOverview() {
     responsesBox.querySelectorAll("[data-allow-retry]").forEach((btn) => {
       btn.addEventListener("click", () => allowRetry(btn.getAttribute("data-allow-retry")));
     });
+
+    latestJudgeVerdicts = Array.isArray(data.judgeVerdicts) ? data.judgeVerdicts : [];
+    syncJudgeTeamOptions(data.responseBreakdown);
+    renderRows(
+      judgeVerdictBox,
+      latestJudgeVerdicts.map(
+        (item) =>
+          `<strong>${item.teamId}</strong> | <span class="muted">${item.verdict}</span><br/>Judge: ${item.judgeName || "Not specified"}<br/>${item.comments || "No comments"}`
+      ),
+      "No judge verdicts saved yet."
+    );
     queueNextRefresh(Boolean(data.activeSet), false);
   } catch (error) {
     if ((error.message || "").toLowerCase().includes("unauthorized")) {
@@ -429,6 +514,8 @@ showLeaderboardBtn?.addEventListener("click", () => updatePublicLeaderboard("sho
 saveLeaderboardBtn?.addEventListener("click", () => updatePublicLeaderboard("save"));
 hideLeaderboardBtn?.addEventListener("click", () => updatePublicLeaderboard("hide"));
 resetLeaderboardBtn?.addEventListener("click", () => updatePublicLeaderboard("reset"));
+judgeTeamSelect?.addEventListener("change", fillJudgeForm);
+saveJudgeVerdictBtn?.addEventListener("click", saveJudgeVerdict);
 
 status("Controller session restored.", "ok");
 refreshOverview();

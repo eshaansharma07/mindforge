@@ -132,6 +132,40 @@
         </article>
       </section>
 
+      <section class="section reveal">
+        <article class="card">
+          <h3>Judge Verdict Panel</h3>
+          <label for="codingJudgeTeamSelect">Choose Team</label>
+          <select id="codingJudgeTeamSelect">
+            <option value="">Select Team</option>
+          </select>
+
+          <label for="codingJudgeVerdictSelect">Verdict</label>
+          <select id="codingJudgeVerdictSelect">
+            <option value="Approved">Approved</option>
+            <option value="Needs Review">Needs Review</option>
+            <option value="Flagged">Flagged</option>
+            <option value="Disqualified">Disqualified</option>
+          </select>
+
+          <label for="codingJudgeNameInput">Judge Name</label>
+          <input class="input" id="codingJudgeNameInput" placeholder="Judge name" />
+
+          <label for="codingJudgeCommentsInput">Comments</label>
+          <textarea id="codingJudgeCommentsInput" placeholder="Write judging remarks, logic concerns, or fairness notes..."></textarea>
+
+          <div class="cta-row" style="justify-content:flex-start;margin-top:10px;">
+            <button class="btn primary" id="saveCodingJudgeVerdictBtn" type="button">Save Verdict</button>
+          </div>
+          <p id="codingJudgeVerdictStatus" class="status"></p>
+        </article>
+
+        <article class="card">
+          <h3>Saved Judge Verdicts</h3>
+          <div id="codingJudgeVerdictBox" class="list"></div>
+        </article>
+      </section>
+
       <footer class="footer reveal">
         <div>
           <div class="muted">Round 2 Coding Controller | Mind Forge 2026</div>

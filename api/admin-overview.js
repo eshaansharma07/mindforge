@@ -59,6 +59,7 @@ module.exports = async (req, res) => {
     let activeSet = null;
     let leaderboard = [];
     let responseBreakdown = [];
+    let judgeVerdicts = [];
 
     if (activeSetRaw) {
       activeSet = {
@@ -79,36 +80,50 @@ module.exports = async (req, res) => {
     }
 
     if (sourceSet) {
-      leaderboard = await remember(`admin-overview-leaderboard:${sourceSet.setId}`, ADMIN_RESULT_CACHE_TTL_MS, () =>
-        db
-          .collection("quiz_responses")
-          .aggregate([
-            { $match: { setId: sourceSet.setId } },
-            { $sort: { points: -1, elapsedMs: 1 } },
-            {
-              $lookup: {
-                from: "teams",
-                localField: "teamId",
-                foreignField: "teamId",
-                as: "team"
-              }
-            },
-            {
-              $project: {
-                _id: 0,
-                teamId: 1,
-                points: 1,
-                correctCount: 1,
-                totalQuestions: 1,
-                elapsedMs: 1,
-                answers: 1,
-                teamName: { $arrayElemAt: ["$team.teamName", 0] }
-              }
-            },
-            { $limit: 20 }
-          ])
-          .toArray()
-      );
+      const roundState = await remember(`admin-overview-round-state:${sourceSet.setId}`, ADMIN_RESULT_CACHE_TTL_MS, async () => {
+        const [leaderboardRows, verdictRows] = await Promise.all([
+          db
+            .collection("quiz_responses")
+            .aggregate([
+              { $match: { setId: sourceSet.setId } },
+              { $sort: { points: -1, elapsedMs: 1 } },
+              {
+                $lookup: {
+                  from: "teams",
+                  localField: "teamId",
+                  foreignField: "teamId",
+                  as: "team"
+                }
+              },
+              {
+                $project: {
+                  _id: 0,
+                  teamId: 1,
+                  points: 1,
+                  correctCount: 1,
+                  totalQuestions: 1,
+                  elapsedMs: 1,
+                  answers: 1,
+                  teamName: { $arrayElemAt: ["$team.teamName", 0] }
+                }
+              },
+              { $limit: 20 }
+            ])
+            .toArray(),
+          db.collection("judge_verdicts")
+            .find(
+              { roundType: "quiz", sourceId: sourceSet.setId },
+              { projection: { _id: 0, teamId: 1, verdict: 1, judgeName: 1, comments: 1, updatedAt: 1 } }
+            )
+            .sort({ updatedAt: -1 })
+            .toArray()
+        ]);
+
+        return { leaderboardRows, verdictRows };
+      });
+
+      leaderboard = roundState.leaderboardRows;
+      judgeVerdicts = roundState.verdictRows;
 
       responseBreakdown = leaderboard.map((row) => ({
         teamId: row.teamId,
@@ -139,7 +154,8 @@ module.exports = async (req, res) => {
         isReset: Boolean(sharedState.leaderboardState?.isReset),
         entries: Array.isArray(sharedState.leaderboardState?.entries) ? sharedState.leaderboardState.entries : []
       },
-      responseBreakdown
+      responseBreakdown,
+      judgeVerdicts
     });
   } catch (error) {
     return send(res, 500, { success: false, message: error.message || "Failed to load admin overview" });

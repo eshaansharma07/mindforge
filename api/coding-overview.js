@@ -41,6 +41,7 @@ module.exports = async (req, res) => {
     let activeRound = null;
     let leaderboard = [];
     let submissions = [];
+    let judgeVerdicts = [];
 
     if (activeRoundRaw) {
       activeRound = {
@@ -55,28 +56,42 @@ module.exports = async (req, res) => {
     }
 
     if (sourceRound) {
-      submissions = await remember(`coding-overview-submissions:${sourceRound.roundId}`, CODING_RESULT_CACHE_TTL_MS, () =>
-        db
-          .collection("coding_submissions")
-          .find({ roundId: sourceRound.roundId }, {
-            projection: {
-              _id: 0,
-              roundId: 1,
-              teamId: 1,
-              teamName: 1,
-              code: 1,
-              totalCases: 1,
-              correctCount: 1,
-              totalPoints: 1,
-              elapsedMs: 1,
-              submissionMode: 1,
-              evaluatedCases: 1,
-              submittedAt: 1
-            }
-          })
-          .sort({ totalPoints: -1, correctCount: -1, elapsedMs: 1, submittedAt: 1 })
-          .toArray()
-      );
+      const roundState = await remember(`coding-overview-round-state:${sourceRound.roundId}`, CODING_RESULT_CACHE_TTL_MS, async () => {
+        const [submissionRows, verdictRows] = await Promise.all([
+          db
+            .collection("coding_submissions")
+            .find({ roundId: sourceRound.roundId }, {
+              projection: {
+                _id: 0,
+                roundId: 1,
+                teamId: 1,
+                teamName: 1,
+                code: 1,
+                totalCases: 1,
+                correctCount: 1,
+                totalPoints: 1,
+                elapsedMs: 1,
+                submissionMode: 1,
+                evaluatedCases: 1,
+                submittedAt: 1
+              }
+            })
+            .sort({ totalPoints: -1, correctCount: -1, elapsedMs: 1, submittedAt: 1 })
+            .toArray(),
+          db.collection("judge_verdicts")
+            .find(
+              { roundType: "coding", sourceId: sourceRound.roundId },
+              { projection: { _id: 0, teamId: 1, verdict: 1, judgeName: 1, comments: 1, updatedAt: 1 } }
+            )
+            .sort({ updatedAt: -1 })
+            .toArray()
+        ]);
+
+        return { submissionRows, verdictRows };
+      });
+
+      submissions = roundState.submissionRows;
+      judgeVerdicts = roundState.verdictRows;
 
       leaderboard = buildCodingLeaderboardRows(submissions);
     }
@@ -113,7 +128,8 @@ module.exports = async (req, res) => {
         isVisible: Boolean(leaderboardState?.isVisible),
         entries: Array.isArray(leaderboardState?.entries) ? leaderboardState.entries : []
       },
-      submissions
+      submissions,
+      judgeVerdicts
     });
   } catch (error) {
     return send(res, 500, { success: false, message: error.message || "Failed to load coding controller overview" });

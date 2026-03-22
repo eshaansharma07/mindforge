@@ -66,6 +66,7 @@ module.exports = async (req, res) => {
     });
 
     forget(`coding-overview-submissions:${roundId}`);
+    forget(`coding-overview-round-state:${roundId}`);
     forget("coding-overview-shared");
 
     return send(res, 200, {

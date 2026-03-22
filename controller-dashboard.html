@@ -128,6 +128,40 @@
         <div id="responsesBox" class="list"></div>
       </section>
 
+      <section class="section reveal">
+        <article class="card">
+          <h3>Judge Verdict Panel</h3>
+          <label for="judgeTeamSelect">Choose Team</label>
+          <select id="judgeTeamSelect">
+            <option value="">Select Team</option>
+          </select>
+
+          <label for="judgeVerdictSelect">Verdict</label>
+          <select id="judgeVerdictSelect">
+            <option value="Approved">Approved</option>
+            <option value="Needs Review">Needs Review</option>
+            <option value="Flagged">Flagged</option>
+            <option value="Disqualified">Disqualified</option>
+          </select>
+
+          <label for="judgeNameInput">Judge Name</label>
+          <input class="input" id="judgeNameInput" placeholder="Judge name" />
+
+          <label for="judgeCommentsInput">Comments</label>
+          <textarea id="judgeCommentsInput" placeholder="Write remarks, tie-break notes, or fairness concerns..."></textarea>
+
+          <div class="cta-row" style="justify-content:flex-start;margin-top:10px;">
+            <button class="btn primary" id="saveJudgeVerdictBtn" type="button">Save Verdict</button>
+          </div>
+          <p id="judgeVerdictStatus" class="status"></p>
+        </article>
+
+        <article class="card">
+          <h3>Saved Judge Verdicts</h3>
+          <div id="judgeVerdictBox" class="list"></div>
+        </article>
+      </section>
+
       <footer class="footer reveal">
         <div>
           <div class="muted">Controller Dashboard | Mind Forge 2026</div>

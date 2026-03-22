@@ -33,6 +33,7 @@ async function getDb() {
       db.collection("coding_sessions").createIndex({ teamId: 1 }, { unique: true }),
       db.collection("quiz_responses").createIndex({ setId: 1, teamId: 1 }, { unique: true }),
       db.collection("coding_submissions").createIndex({ roundId: 1, teamId: 1 }, { unique: true }),
+      db.collection("judge_verdicts").createIndex({ roundType: 1, sourceId: 1, teamId: 1 }, { unique: true }),
       db.collection("quiz_sets").createIndex({ isActive: 1, endAt: 1 }),
       db.collection("coding_rounds").createIndex({ isActive: 1, endAt: 1 }),
       db.collection("announcements").createIndex({ createdAt: -1 }),

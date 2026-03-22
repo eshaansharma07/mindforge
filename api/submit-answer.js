@@ -96,6 +96,7 @@ module.exports = async (req, res) => {
     });
 
     forget(`admin-overview-leaderboard:${setId}`);
+    forget(`admin-overview-round-state:${setId}`);
     forget("admin-overview-shared");
 
     return send(res, 200, {

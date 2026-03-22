@@ -40,6 +40,7 @@ function invalidateQuizCaches(setId = "") {
   forget("admin-overview-latest-set");
   if (setId) {
     forget(`admin-overview-leaderboard:${setId}`);
+    forget(`admin-overview-round-state:${setId}`);
   }
 }
 
@@ -51,7 +52,41 @@ function invalidateCodingCaches(roundId = "") {
   forget("coding-overview-shared");
   if (roundId) {
     forget(`coding-overview-submissions:${roundId}`);
+    forget(`coding-overview-round-state:${roundId}`);
   }
+}
+
+async function saveJudgeVerdict(db, payload) {
+  const roundType = String(payload.roundType || "").trim().toLowerCase();
+  const sourceId = String(payload.sourceId || "").trim();
+  const teamId = String(payload.teamId || "").trim().toUpperCase();
+  const verdict = String(payload.verdict || "").trim();
+  const judgeName = String(payload.judgeName || "").trim();
+  const comments = String(payload.comments || "").trim();
+
+  if (!["quiz", "coding"].includes(roundType)) {
+    throw new Error("Invalid roundType for judge verdict.");
+  }
+
+  if (!sourceId || !teamId || !verdict) {
+    throw new Error("sourceId, teamId and verdict are required.");
+  }
+
+  await db.collection("judge_verdicts").updateOne(
+    { roundType, sourceId, teamId },
+    {
+      $set: {
+        roundType,
+        sourceId,
+        teamId,
+        verdict,
+        judgeName,
+        comments,
+        updatedAt: new Date()
+      }
+    },
+    { upsert: true }
+  );
 }
 
 module.exports = async (req, res) => {
@@ -281,6 +316,24 @@ module.exports = async (req, res) => {
       return send(res, 200, { success: true, teamId, setId });
     }
 
+    if (action === "savejudgeverdict") {
+      try {
+        await saveJudgeVerdict(db, {
+          roundType: "quiz",
+          sourceId: data.setId,
+          teamId: data.teamId,
+          verdict: data.verdict,
+          judgeName: data.judgeName,
+          comments: data.comments
+        });
+      } catch (error) {
+        return send(res, 400, { success: false, message: error.message });
+      }
+
+      invalidateQuizCaches(String(data.setId || "").trim());
+      return send(res, 200, { success: true });
+    }
+
     if (action === "leaderboard") {
       const mode = String(data.mode || "").trim().toLowerCase();
       if (!["show", "hide", "save", "reset"].includes(mode)) {
@@ -468,6 +521,24 @@ module.exports = async (req, res) => {
       invalidateCodingCaches(roundId);
 
       return send(res, 200, { success: true, teamId, roundId });
+    }
+
+    if (action === "savecodingjudgeverdict") {
+      try {
+        await saveJudgeVerdict(db, {
+          roundType: "coding",
+          sourceId: data.roundId,
+          teamId: data.teamId,
+          verdict: data.verdict,
+          judgeName: data.judgeName,
+          comments: data.comments
+        });
+      } catch (error) {
+        return send(res, 400, { success: false, message: error.message });
+      }
+
+      invalidateCodingCaches(String(data.roundId || "").trim());
+      return send(res, 200, { success: true });
     }
 
     if (action === "codingleaderboard") {

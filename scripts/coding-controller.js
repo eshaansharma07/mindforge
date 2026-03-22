@@ -9,6 +9,13 @@ const roundSummary = document.getElementById("codingRoundSummary");
 const leaderboardTable = document.getElementById("codingLeaderboardTable");
 const submissionReview = document.getElementById("codingSubmissionReview");
 const submissionFilter = document.getElementById("codingSubmissionFilter");
+const judgeTeamSelect = document.getElementById("codingJudgeTeamSelect");
+const judgeVerdictSelect = document.getElementById("codingJudgeVerdictSelect");
+const judgeNameInput = document.getElementById("codingJudgeNameInput");
+const judgeCommentsInput = document.getElementById("codingJudgeCommentsInput");
+const saveJudgeVerdictBtn = document.getElementById("saveCodingJudgeVerdictBtn");
+const judgeVerdictStatus = document.getElementById("codingJudgeVerdictStatus");
+const judgeVerdictBox = document.getElementById("codingJudgeVerdictBox");
 const leaderboardEditor = document.getElementById("codingLeaderboardEditor");
 const leaderboardStatus = document.getElementById("codingLeaderboardStatus");
 const showLeaderboardBtn = document.getElementById("showCodingLeaderboardBtn");
@@ -21,6 +28,7 @@ let sourceRoundId = null;
 let latestComputedLeaderboard = [];
 let leaderboardEditorDirty = false;
 let selectedSubmissionTeamId = "all";
+let latestJudgeVerdicts = [];
 let overviewRequestInFlight = false;
 let overviewPollTimeout = null;
 
@@ -57,6 +65,12 @@ function status(msg, type = "") {
 function leaderboardMessage(msg, type = "") {
   leaderboardStatus.textContent = msg;
   leaderboardStatus.className = `status ${type}`.trim();
+}
+
+function judgeStatus(msg, type = "") {
+  if (!judgeVerdictStatus) return;
+  judgeVerdictStatus.textContent = msg;
+  judgeVerdictStatus.className = `status ${type}`.trim();
 }
 
 function redirectToAccess() {
@@ -124,6 +138,66 @@ function syncSubmissionFilter(submissions) {
   const hasPrevious = previousValue === "all" || (submissions || []).some((submission) => submission.teamId === previousValue);
   selectedSubmissionTeamId = hasPrevious ? previousValue : "all";
   submissionFilter.value = selectedSubmissionTeamId;
+}
+
+function syncJudgeTeamOptions(submissions) {
+  if (!judgeTeamSelect) return;
+
+  const rows = Array.isArray(submissions) ? submissions : [];
+  const selectedValue = judgeTeamSelect.value || "";
+  judgeTeamSelect.innerHTML = [
+    `<option value="">Select Team</option>`,
+    ...rows.map(
+      (submission) =>
+        `<option value="${escapeHtml(submission.teamId)}">${escapeHtml(submission.teamName || submission.teamId)} (${escapeHtml(submission.teamId)})</option>`
+    )
+  ].join("");
+
+  const stillExists = rows.some((submission) => submission.teamId === selectedValue);
+  judgeTeamSelect.value = stillExists ? selectedValue : "";
+  fillJudgeForm();
+}
+
+function fillJudgeForm() {
+  const teamId = judgeTeamSelect?.value || "";
+  if (!teamId) {
+    if (judgeVerdictSelect) judgeVerdictSelect.value = "Approved";
+    if (judgeNameInput) judgeNameInput.value = "";
+    if (judgeCommentsInput) judgeCommentsInput.value = "";
+    return;
+  }
+
+  const existing = latestJudgeVerdicts.find((item) => item.teamId === teamId);
+  if (judgeVerdictSelect) judgeVerdictSelect.value = existing?.verdict || "Approved";
+  if (judgeNameInput) judgeNameInput.value = existing?.judgeName || "";
+  if (judgeCommentsInput) judgeCommentsInput.value = existing?.comments || "";
+}
+
+async function saveJudgeVerdict() {
+  if (lockRequired()) return;
+  const teamId = judgeTeamSelect?.value || "";
+
+  if (!sourceRoundId || !teamId) {
+    judgeStatus("Select a team submission before saving a verdict.", "err");
+    return;
+  }
+
+  judgeStatus("Saving judge verdict...");
+
+  try {
+    await api("/api/admin-action", "POST", {
+      action: "saveCodingJudgeVerdict",
+      roundId: sourceRoundId,
+      teamId,
+      verdict: judgeVerdictSelect?.value || "Approved",
+      judgeName: judgeNameInput?.value || "",
+      comments: judgeCommentsInput?.value || ""
+    });
+    judgeStatus(`Verdict saved for ${teamId}.`, "ok");
+    refreshOverview();
+  } catch (error) {
+    judgeStatus(error.message || "Could not save judge verdict.", "err");
+  }
 }
 
 function decodeField(value) {
@@ -304,7 +378,9 @@ async function refreshOverview() {
     );
 
     const allSubmissions = data.submissions || [];
+    latestJudgeVerdicts = Array.isArray(data.judgeVerdicts) ? data.judgeVerdicts : [];
     syncSubmissionFilter(allSubmissions);
+    syncJudgeTeamOptions(allSubmissions);
     const visibleSubmissions =
       selectedSubmissionTeamId === "all"
         ? allSubmissions
@@ -328,6 +404,14 @@ async function refreshOverview() {
     submissionReview.querySelectorAll("[data-reset-coding]").forEach((button) => {
       button.addEventListener("click", () => allowCodingRetry(button.getAttribute("data-reset-coding")));
     });
+    renderRows(
+      judgeVerdictBox,
+      latestJudgeVerdicts.map(
+        (item) =>
+          `<strong>${escapeHtml(item.teamId)}</strong> | <span class="muted">${escapeHtml(item.verdict)}</span><br/>Judge: ${escapeHtml(item.judgeName || "Not specified")}<br/>${escapeHtml(item.comments || "No comments")}`
+      ),
+      "No judge verdicts saved yet."
+    );
     queueNextRefresh(Boolean(data.activeRound), false);
   } catch (error) {
     if ((error.message || "").toLowerCase().includes("unauthorized")) {
@@ -405,6 +489,8 @@ submissionFilter?.addEventListener("change", () => {
   selectedSubmissionTeamId = submissionFilter.value || "all";
   refreshOverview();
 });
+judgeTeamSelect?.addEventListener("change", fillJudgeForm);
+saveJudgeVerdictBtn?.addEventListener("click", saveJudgeVerdict);
 
 showLeaderboardBtn?.addEventListener("click", () => updateCodingLeaderboard("show"));
 saveLeaderboardBtn?.addEventListener("click", () => updateCodingLeaderboard("save"));
