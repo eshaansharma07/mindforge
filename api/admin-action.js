@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const { ObjectId } = require("mongodb");
 const { getDb } = require("./_lib/db");
 const { send, methodNotAllowed, readBody, requireAdmin } = require("./_lib/http");
+const { forget } = require("./_lib/runtime-cache");
 
 function normalizeEntries(entries) {
   return (Array.isArray(entries) ? entries : [])
@@ -29,6 +30,28 @@ function normalizeCodingLeaderboardEntries(entries) {
       elapsedMs: Math.max(0, Number(entry.elapsedMs || 0))
     }))
     .filter((entry) => entry.teamId || entry.teamName);
+}
+
+function invalidateQuizCaches(setId = "") {
+  forget("candidate-dashboard-state");
+  forget("active-quiz-set");
+  forget("admin-overview-shared");
+  forget("admin-overview-active-set");
+  forget("admin-overview-latest-set");
+  if (setId) {
+    forget(`admin-overview-leaderboard:${setId}`);
+  }
+}
+
+function invalidateCodingCaches(roundId = "") {
+  forget("coding-shared-state");
+  forget("active-coding-round");
+  forget("coding-overview-active-round");
+  forget("coding-overview-latest-round");
+  forget("coding-overview-shared");
+  if (roundId) {
+    forget(`coding-overview-submissions:${roundId}`);
+  }
 }
 
 module.exports = async (req, res) => {
@@ -76,6 +99,9 @@ module.exports = async (req, res) => {
         createdAt: new Date()
       });
 
+      invalidateQuizCaches();
+      invalidateCodingCaches();
+
       return send(res, 200, { success: true });
     }
 
@@ -91,6 +117,9 @@ module.exports = async (req, res) => {
       if (!result.deletedCount) {
         return send(res, 404, { success: false, message: "Announcement not found." });
       }
+
+      invalidateQuizCaches();
+      invalidateCodingCaches();
 
       return send(res, 200, { success: true, announcementId });
     }
@@ -142,6 +171,8 @@ module.exports = async (req, res) => {
         createdAt: new Date()
       });
 
+      invalidateQuizCaches(setId);
+
       return send(res, 200, {
         success: true,
         setId,
@@ -161,6 +192,8 @@ module.exports = async (req, res) => {
         { _id: active._id },
         { $set: { isActive: false, endAt: new Date() } }
       );
+
+      invalidateQuizCaches(active.setId);
 
       return send(res, 200, { success: true, setId: active.setId });
     }
@@ -203,6 +236,9 @@ module.exports = async (req, res) => {
         );
       }
 
+      invalidateQuizCaches();
+      invalidateCodingCaches();
+
       return send(res, 200, { success: true, teamId });
     }
 
@@ -240,6 +276,8 @@ module.exports = async (req, res) => {
         );
       }
 
+      invalidateQuizCaches(setId);
+
       return send(res, 200, { success: true, teamId, setId });
     }
 
@@ -263,6 +301,7 @@ module.exports = async (req, res) => {
           { upsert: true }
         );
 
+        invalidateQuizCaches();
         return send(res, 200, { success: true, isVisible: false });
       }
 
@@ -281,6 +320,7 @@ module.exports = async (req, res) => {
           { upsert: true }
         );
 
+        invalidateQuizCaches();
         return send(res, 200, { success: true, isVisible: false, entryCount: 0 });
       }
 
@@ -302,6 +342,8 @@ module.exports = async (req, res) => {
         },
         { upsert: true }
       );
+
+      invalidateQuizCaches();
 
       return send(res, 200, { success: true, isVisible: mode === "show", entryCount: entries.length });
     }
@@ -362,6 +404,8 @@ module.exports = async (req, res) => {
         createdAt: new Date()
       });
 
+      invalidateCodingCaches(roundId);
+
       return send(res, 200, {
         success: true,
         roundId,
@@ -381,6 +425,8 @@ module.exports = async (req, res) => {
         { _id: active._id },
         { $set: { isActive: false, endAt: new Date() } }
       );
+
+      invalidateCodingCaches(active.roundId);
 
       return send(res, 200, { success: true, roundId: active.roundId });
     }
@@ -419,6 +465,8 @@ module.exports = async (req, res) => {
         );
       }
 
+      invalidateCodingCaches(roundId);
+
       return send(res, 200, { success: true, teamId, roundId });
     }
 
@@ -442,6 +490,7 @@ module.exports = async (req, res) => {
           { upsert: true }
         );
 
+        invalidateCodingCaches();
         return send(res, 200, { success: true, isVisible: false });
       }
 
@@ -459,6 +508,7 @@ module.exports = async (req, res) => {
           { upsert: true }
         );
 
+        invalidateCodingCaches();
         return send(res, 200, { success: true, isVisible: false, entryCount: 0 });
       }
 
@@ -479,6 +529,8 @@ module.exports = async (req, res) => {
         },
         { upsert: true }
       );
+
+      invalidateCodingCaches();
 
       return send(res, 200, { success: true, isVisible: mode === "show", entryCount: entries.length });
     }

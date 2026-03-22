@@ -1,6 +1,11 @@
 const { getDb } = require("./_lib/db");
 const { send, methodNotAllowed, requireAdmin } = require("./_lib/http");
 const { buildCodingLeaderboardRows } = require("./_lib/coding-round");
+const { remember, forget } = require("./_lib/runtime-cache");
+
+const CODING_ACTIVE_ROUND_CACHE_TTL_MS = 1000;
+const CODING_RESULT_CACHE_TTL_MS = 1200;
+const CODING_SHARED_CACHE_TTL_MS = 1500;
 
 module.exports = async (req, res) => {
   if (req.method !== "GET") return methodNotAllowed(res);
@@ -10,9 +15,15 @@ module.exports = async (req, res) => {
     const db = await getDb();
 
     const [activeRoundFound, latestRoundRaw, leaderboardState] = await Promise.all([
-      db.collection("coding_rounds").findOne({ isActive: true }),
-      db.collection("coding_rounds").find({}).sort({ createdAt: -1 }).limit(1).next(),
-      db.collection("coding_leaderboard_state").findOne({ key: "public" })
+      remember("coding-overview-active-round", CODING_ACTIVE_ROUND_CACHE_TTL_MS, () =>
+        db.collection("coding_rounds").findOne({ isActive: true })
+      ),
+      remember("coding-overview-latest-round", CODING_RESULT_CACHE_TTL_MS, () =>
+        db.collection("coding_rounds").find({}).sort({ createdAt: -1 }).limit(1).next()
+      ),
+      remember("coding-overview-shared", CODING_SHARED_CACHE_TTL_MS, () =>
+        db.collection("coding_leaderboard_state").findOne({ key: "public" })
+      )
     ]);
 
     let activeRoundRaw = activeRoundFound;
@@ -21,6 +32,7 @@ module.exports = async (req, res) => {
         { _id: activeRoundRaw._id },
         { $set: { isActive: false } }
       );
+      forget("coding-overview-active-round");
       activeRoundRaw = null;
     }
 
@@ -43,26 +55,28 @@ module.exports = async (req, res) => {
     }
 
     if (sourceRound) {
-      submissions = await db
-        .collection("coding_submissions")
-        .find({ roundId: sourceRound.roundId }, {
-          projection: {
-            _id: 0,
-            roundId: 1,
-            teamId: 1,
-            teamName: 1,
-            code: 1,
-            totalCases: 1,
-            correctCount: 1,
-            totalPoints: 1,
-            elapsedMs: 1,
-            submissionMode: 1,
-            evaluatedCases: 1,
-            submittedAt: 1
-          }
-        })
-        .sort({ totalPoints: -1, correctCount: -1, elapsedMs: 1, submittedAt: 1 })
-        .toArray();
+      submissions = await remember(`coding-overview-submissions:${sourceRound.roundId}`, CODING_RESULT_CACHE_TTL_MS, () =>
+        db
+          .collection("coding_submissions")
+          .find({ roundId: sourceRound.roundId }, {
+            projection: {
+              _id: 0,
+              roundId: 1,
+              teamId: 1,
+              teamName: 1,
+              code: 1,
+              totalCases: 1,
+              correctCount: 1,
+              totalPoints: 1,
+              elapsedMs: 1,
+              submissionMode: 1,
+              evaluatedCases: 1,
+              submittedAt: 1
+            }
+          })
+          .sort({ totalPoints: -1, correctCount: -1, elapsedMs: 1, submittedAt: 1 })
+          .toArray()
+      );
 
       leaderboard = buildCodingLeaderboardRows(submissions);
     }

@@ -19,6 +19,24 @@ let adminKey = sessionStorage.getItem("mindforge_admin_key") || "";
 let sourceRoundId = null;
 let latestComputedLeaderboard = [];
 let leaderboardEditorDirty = false;
+let overviewRequestInFlight = false;
+let overviewPollTimeout = null;
+
+const ACTIVE_REFRESH_MS = 4000;
+const IDLE_REFRESH_MS = 7000;
+const ERROR_REFRESH_MS = 9000;
+
+function nextRefreshDelay(hasActiveRound, hadError = false) {
+  const base = hadError ? ERROR_REFRESH_MS : hasActiveRound ? ACTIVE_REFRESH_MS : IDLE_REFRESH_MS;
+  return base + Math.floor(Math.random() * 700);
+}
+
+function queueNextRefresh(hasActiveRound = false, hadError = false) {
+  clearTimeout(overviewPollTimeout);
+  overviewPollTimeout = setTimeout(() => {
+    refreshOverview();
+  }, nextRefreshDelay(hasActiveRound, hadError));
+}
 
 function escapeHtml(value) {
   return String(value || "")
@@ -211,7 +229,8 @@ async function allowCodingRetry(teamId) {
 }
 
 async function refreshOverview() {
-  if (!adminKey) return;
+  if (!adminKey || overviewRequestInFlight) return;
+  overviewRequestInFlight = true;
 
   try {
     const data = await api("/api/coding-overview");
@@ -282,6 +301,7 @@ async function refreshOverview() {
     submissionReview.querySelectorAll("[data-reset-coding]").forEach((button) => {
       button.addEventListener("click", () => allowCodingRetry(button.getAttribute("data-reset-coding")));
     });
+    queueNextRefresh(Boolean(data.activeRound), false);
   } catch (error) {
     if ((error.message || "").toLowerCase().includes("unauthorized")) {
       sessionStorage.removeItem("mindforge_admin_key");
@@ -289,6 +309,9 @@ async function refreshOverview() {
       return;
     }
     status(error.message || "Unable to refresh coding controller overview.", "err");
+    queueNextRefresh(Boolean(sourceRoundId), true);
+  } finally {
+    overviewRequestInFlight = false;
   }
 }
 
@@ -342,6 +365,7 @@ closeRoundBtn?.addEventListener("click", async () => {
 });
 
 logoutBtn?.addEventListener("click", () => {
+  clearTimeout(overviewPollTimeout);
   sessionStorage.removeItem("mindforge_admin_key");
   redirectToAccess();
 });
@@ -357,4 +381,3 @@ resetLeaderboardBtn?.addEventListener("click", () => updateCodingLeaderboard("re
 
 status("Coding controller session restored.", "ok");
 refreshOverview();
-setInterval(refreshOverview, 3000);

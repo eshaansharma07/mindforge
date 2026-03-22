@@ -1,5 +1,10 @@
 const { getDb } = require("./_lib/db");
 const { send, methodNotAllowed, requireAdmin } = require("./_lib/http");
+const { remember, forget } = require("./_lib/runtime-cache");
+
+const ADMIN_SHARED_CACHE_TTL_MS = 1500;
+const ADMIN_ACTIVE_SET_CACHE_TTL_MS = 1000;
+const ADMIN_RESULT_CACHE_TTL_MS = 1200;
 
 module.exports = async (req, res) => {
   if (req.method !== "GET") return methodNotAllowed(res);
@@ -8,17 +13,27 @@ module.exports = async (req, res) => {
   try {
     const db = await getDb();
 
-    const [teamsCount, latestTeams, activeSetFound, latestSetRaw, latestAnnouncementsRaw, leaderboardState] = await Promise.all([
-      db.collection("teams").countDocuments(),
-      db.collection("teams")
-        .find({}, { projection: { _id: 0, teamId: 1, teamName: 1, department: 1, createdAt: 1 } })
-        .sort({ createdAt: -1 })
-        .limit(8)
-        .toArray(),
-      db.collection("quiz_sets").findOne({ isActive: true }),
-      db.collection("quiz_sets").find({}).sort({ createdAt: -1 }).limit(1).next(),
-      db.collection("announcements").find({}).sort({ createdAt: -1 }).limit(8).toArray(),
-      db.collection("leaderboard_state").findOne({ key: "public" })
+    const [sharedState, activeSetFound, latestSetRaw] = await Promise.all([
+      remember("admin-overview-shared", ADMIN_SHARED_CACHE_TTL_MS, async () => {
+        const [teamsCount, latestTeams, latestAnnouncementsRaw, leaderboardState] = await Promise.all([
+          db.collection("teams").countDocuments(),
+          db.collection("teams")
+            .find({}, { projection: { _id: 0, teamId: 1, teamName: 1, department: 1, createdAt: 1 } })
+            .sort({ createdAt: -1 })
+            .limit(8)
+            .toArray(),
+          db.collection("announcements").find({}).sort({ createdAt: -1 }).limit(8).toArray(),
+          db.collection("leaderboard_state").findOne({ key: "public" })
+        ]);
+
+        return { teamsCount, latestTeams, latestAnnouncementsRaw, leaderboardState };
+      }),
+      remember("admin-overview-active-set", ADMIN_ACTIVE_SET_CACHE_TTL_MS, () =>
+        db.collection("quiz_sets").findOne({ isActive: true })
+      ),
+      remember("admin-overview-latest-set", ADMIN_RESULT_CACHE_TTL_MS, () =>
+        db.collection("quiz_sets").find({}).sort({ createdAt: -1 }).limit(1).next()
+      )
     ]);
 
     let activeSetRaw = activeSetFound;
@@ -27,10 +42,11 @@ module.exports = async (req, res) => {
         { _id: activeSetRaw._id },
         { $set: { isActive: false } }
       );
+      forget("admin-overview-active-set");
       activeSetRaw = null;
     }
 
-    const latestAnnouncements = latestAnnouncementsRaw.map((announcement) => ({
+    const latestAnnouncements = (sharedState.latestAnnouncementsRaw || []).map((announcement) => ({
       announcementId: String(announcement._id),
       title: announcement.title,
       body: announcement.body,
@@ -63,34 +79,36 @@ module.exports = async (req, res) => {
     }
 
     if (sourceSet) {
-      leaderboard = await db
-        .collection("quiz_responses")
-        .aggregate([
-          { $match: { setId: sourceSet.setId } },
-          { $sort: { points: -1, elapsedMs: 1 } },
-          {
-            $lookup: {
-              from: "teams",
-              localField: "teamId",
-              foreignField: "teamId",
-              as: "team"
-            }
-          },
-          {
-            $project: {
-              _id: 0,
-              teamId: 1,
-              points: 1,
-              correctCount: 1,
-              totalQuestions: 1,
-              elapsedMs: 1,
-              answers: 1,
-              teamName: { $arrayElemAt: ["$team.teamName", 0] }
-            }
-          },
-          { $limit: 20 }
-        ])
-        .toArray();
+      leaderboard = await remember(`admin-overview-leaderboard:${sourceSet.setId}`, ADMIN_RESULT_CACHE_TTL_MS, () =>
+        db
+          .collection("quiz_responses")
+          .aggregate([
+            { $match: { setId: sourceSet.setId } },
+            { $sort: { points: -1, elapsedMs: 1 } },
+            {
+              $lookup: {
+                from: "teams",
+                localField: "teamId",
+                foreignField: "teamId",
+                as: "team"
+              }
+            },
+            {
+              $project: {
+                _id: 0,
+                teamId: 1,
+                points: 1,
+                correctCount: 1,
+                totalQuestions: 1,
+                elapsedMs: 1,
+                answers: 1,
+                teamName: { $arrayElemAt: ["$team.teamName", 0] }
+              }
+            },
+            { $limit: 20 }
+          ])
+          .toArray()
+      );
 
       responseBreakdown = leaderboard.map((row) => ({
         teamId: row.teamId,
@@ -110,16 +128,16 @@ module.exports = async (req, res) => {
 
     return send(res, 200, {
       success: true,
-      teamsCount,
-      latestTeams,
+      teamsCount: sharedState.teamsCount,
+      latestTeams: sharedState.latestTeams,
       activeSet,
       sourceSetId: sourceSet ? sourceSet.setId : null,
       latestAnnouncements,
       leaderboard,
       leaderboardState: {
-        isVisible: Boolean(leaderboardState?.isVisible),
-        isReset: Boolean(leaderboardState?.isReset),
-        entries: Array.isArray(leaderboardState?.entries) ? leaderboardState.entries : []
+        isVisible: Boolean(sharedState.leaderboardState?.isVisible),
+        isReset: Boolean(sharedState.leaderboardState?.isReset),
+        entries: Array.isArray(sharedState.leaderboardState?.entries) ? sharedState.leaderboardState.entries : []
       },
       responseBreakdown
     });

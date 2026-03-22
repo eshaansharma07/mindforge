@@ -65,7 +65,8 @@ module.exports = async (req, res) => {
       submittedAt: new Date()
     });
 
-    forget("coding-leaderboard");
+    forget(`coding-overview-submissions:${roundId}`);
+    forget("coding-overview-shared");
 
     return send(res, 200, {
       success: true,

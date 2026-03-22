@@ -21,6 +21,24 @@ let adminKey = sessionStorage.getItem("mindforge_admin_key") || "";
 let sourceSetId = null;
 let latestComputedLeaderboard = [];
 let leaderboardEditorDirty = false;
+let overviewRequestInFlight = false;
+let overviewPollTimeout = null;
+
+const ACTIVE_REFRESH_MS = 4000;
+const IDLE_REFRESH_MS = 7000;
+const ERROR_REFRESH_MS = 9000;
+
+function nextRefreshDelay(hasActiveSet, hadError = false) {
+  const base = hadError ? ERROR_REFRESH_MS : hasActiveSet ? ACTIVE_REFRESH_MS : IDLE_REFRESH_MS;
+  return base + Math.floor(Math.random() * 700);
+}
+
+function queueNextRefresh(hasActiveSet = false, hadError = false) {
+  clearTimeout(overviewPollTimeout);
+  overviewPollTimeout = setTimeout(() => {
+    refreshOverview();
+  }, nextRefreshDelay(hasActiveSet, hadError));
+}
 
 function status(msg, type = "") {
   adminStatus.textContent = msg;
@@ -239,7 +257,8 @@ async function updatePublicLeaderboard(action) {
 }
 
 async function refreshOverview() {
-  if (!adminKey) return;
+  if (!adminKey || overviewRequestInFlight) return;
+  overviewRequestInFlight = true;
 
   try {
     const data = await api("/api/admin-overview");
@@ -325,6 +344,7 @@ async function refreshOverview() {
     responsesBox.querySelectorAll("[data-allow-retry]").forEach((btn) => {
       btn.addEventListener("click", () => allowRetry(btn.getAttribute("data-allow-retry")));
     });
+    queueNextRefresh(Boolean(data.activeSet), false);
   } catch (error) {
     if ((error.message || "").toLowerCase().includes("unauthorized")) {
       sessionStorage.removeItem("mindforge_admin_key");
@@ -332,6 +352,9 @@ async function refreshOverview() {
       return;
     }
     status(error.message || "Unable to refresh overview", "err");
+    queueNextRefresh(Boolean(sourceSetId), true);
+  } finally {
+    overviewRequestInFlight = false;
   }
 }
 
@@ -395,6 +418,7 @@ closeQuestionBtn?.addEventListener("click", async () => {
 });
 
 controllerLogoutBtn?.addEventListener("click", () => {
+  clearTimeout(overviewPollTimeout);
   sessionStorage.removeItem("mindforge_admin_key");
   redirectToAccess();
 });
@@ -408,4 +432,3 @@ resetLeaderboardBtn?.addEventListener("click", () => updatePublicLeaderboard("re
 
 status("Controller session restored.", "ok");
 refreshOverview();
-setInterval(refreshOverview, 3000);

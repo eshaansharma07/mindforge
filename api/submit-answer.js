@@ -1,6 +1,7 @@
 const { getDb } = require("./_lib/db");
 const { send, methodNotAllowed, readBody } = require("./_lib/http");
 const { validateCandidateSession } = require("./_lib/candidate-session");
+const { forget } = require("./_lib/runtime-cache");
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") return methodNotAllowed(res);
@@ -93,6 +94,9 @@ module.exports = async (req, res) => {
       answers: evaluatedAnswers,
       submittedAt: new Date()
     });
+
+    forget(`admin-overview-leaderboard:${setId}`);
+    forget("admin-overview-shared");
 
     return send(res, 200, {
       success: true,
