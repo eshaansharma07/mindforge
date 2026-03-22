@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Controller Access | Mind Forge 2026</title>
+  <title>Judges Access | Mind Forge 2026</title>
   <script>
     document.documentElement.dataset.theme = localStorage.getItem("mindforge_theme") || "dark";
   </script>
@@ -19,7 +19,6 @@
       <div class="nav-actions">
         <div class="nav-links">
           <a href="/index.html">Home</a>
-          <a href="/index.html#events">Events</a>
           <a href="/candidate.html">Portal</a>
           <a href="/coding-round.html">Round 2 Coding</a>
           <a href="/admin.html">Controller</a>
@@ -31,44 +30,26 @@
 
     <section class="content">
       <header class="section-title reveal">
-        <h2>Controller Access</h2>
+        <h2>Judges Access</h2>
         <div class="divider"></div>
-        <p>Authorized controllers can unlock the event command center using the secure access key.</p>
+        <p>Authorized judges can review Round 1 and Round 2 submissions and record official verdicts here.</p>
       </header>
 
       <section class="admin-access reveal">
         <article class="register-wrap admin-access-card">
-          <h3>Controller Login</h3>
-          <form id="adminLoginForm">
-            <label>Controller Key</label>
+          <h3>Judge Login</h3>
+          <form id="judgeLoginForm">
+            <label>Judge Key</label>
             <input class="input" name="key" type="password" required />
-            <button class="btn primary" type="submit">Open Dashboard</button>
-            <p id="adminStatus" class="status"></p>
+            <button class="btn primary" type="submit">Open Judges Portal</button>
+            <p id="judgeAccessStatus" class="status"></p>
           </form>
         </article>
       </section>
-
-      <footer class="footer reveal">
-        <div>
-          <div class="muted">Controller Access | Mind Forge 2026</div>
-          <div class="muted">Only authorized event controllers should proceed beyond this point</div>
-        </div>
-        <div class="footer-logos">
-          <img
-            class="footer-logo ai-footer-logo theme-ai-logo"
-            src="/assets/ai-alliance-cropped.svg"
-            data-logo-dark="/assets/ai-alliance-cropped.svg"
-            data-logo-light="/assets/ai-alliance-light.svg"
-            alt="AI Alliance Logo"
-          />
-          <img class="footer-logo cu-footer-logo" src="https://www.cuchd.in/about/assets/images/cu-logo.png" alt="Chandigarh University Logo" />
-          <img class="footer-logo" src="/assets/unstop-logo.svg" alt="Unstop Logo" />
-        </div>
-      </footer>
     </section>
   </main>
 
   <script src="/scripts/theme.js"></script>
-  <script src="/scripts/admin-login.js"></script>
+  <script src="/scripts/judges-login.js"></script>
 </body>
 </html>

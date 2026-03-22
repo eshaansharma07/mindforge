@@ -1,5 +1,5 @@
 const { getDb } = require("./_lib/db");
-const { send, methodNotAllowed, requireAdmin } = require("./_lib/http");
+const { send, methodNotAllowed, requireAdminOrJudge } = require("./_lib/http");
 const { remember, forget } = require("./_lib/runtime-cache");
 
 const ADMIN_SHARED_CACHE_TTL_MS = 1500;
@@ -8,7 +8,7 @@ const ADMIN_RESULT_CACHE_TTL_MS = 1200;
 
 module.exports = async (req, res) => {
   if (req.method !== "GET") return methodNotAllowed(res);
-  if (!requireAdmin(req, res)) return;
+  if (!requireAdminOrJudge(req, res)) return;
 
   try {
     const db = await getDb();

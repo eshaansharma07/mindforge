@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const { ObjectId } = require("mongodb");
 const { getDb } = require("./_lib/db");
-const { send, methodNotAllowed, readBody, requireAdmin } = require("./_lib/http");
+const { send, methodNotAllowed, readBody, requireAdmin, requireAdminOrJudge, getJudgeKey } = require("./_lib/http");
 const { forget } = require("./_lib/runtime-cache");
 
 function normalizeEntries(entries) {
@@ -114,7 +114,25 @@ module.exports = async (req, res) => {
       return send(res, 401, { success: false, message: "Invalid controller key." });
     }
 
-    if (!requireAdmin(req, res)) return;
+    if (action === "judgeauth") {
+      const key = String(data.key || "");
+      const judgeKey = getJudgeKey();
+
+      if (!judgeKey) {
+        return send(res, 500, { success: false, message: "JUDGE_KEY or ADMIN_KEY missing in environment." });
+      }
+
+      if (key === judgeKey) {
+        return send(res, 200, { success: true });
+      }
+
+      return send(res, 401, { success: false, message: "Invalid judge key." });
+    }
+
+    const judgeActions = new Set(["savejudgeverdict", "savecodingjudgeverdict"]);
+    if (judgeActions.has(action)) {
+      if (!requireAdminOrJudge(req, res)) return;
+    } else if (!requireAdmin(req, res)) return;
 
     const db = await getDb();
 

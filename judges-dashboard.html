@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Judges Dashboard | Mind Forge 2026</title>
+  <script>
+    document.documentElement.dataset.theme = localStorage.getItem("mindforge_theme") || "dark";
+  </script>
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <div class="grid-glow"></div>
+  <main class="page">
+    <nav class="nav reveal">
+      <div class="brand">
+        <span class="quick-brand">MIND FORGE</span>
+      </div>
+      <div class="nav-actions">
+        <div class="nav-links">
+          <a href="/index.html">Home</a>
+          <a href="/candidate.html">Portal</a>
+          <a href="/coding-round.html">Round 2 Coding</a>
+          <a href="/controller-dashboard.html">Controller</a>
+          <a href="/judges-dashboard.html">Judges</a>
+        </div>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">Light Mode</button>
+      </div>
+    </nav>
+
+    <section class="content">
+      <header class="section-title reveal">
+        <h2>Judges Dashboard</h2>
+        <div class="divider"></div>
+        <p>Review submissions, record verdicts, and keep judging decisions separate from controller controls.</p>
+      </header>
+
+      <section class="section reveal">
+        <article class="card">
+          <h3>Judge Session</h3>
+          <p class="muted">This portal is limited to review and verdict actions only.</p>
+          <div class="cta-row" style="justify-content:flex-start;margin-top:14px;">
+            <button class="btn" id="judgeLogoutBtn" type="button">Exit Judges Portal</button>
+          </div>
+          <p id="judgeDashboardStatus" class="status"></p>
+        </article>
+      </section>
+
+      <section class="section reveal">
+        <article class="card">
+          <h3>Round 1 Quiz Review</h3>
+          <label for="judgeQuizTeamSelect">Choose Team</label>
+          <select id="judgeQuizTeamSelect">
+            <option value="all">All Teams</option>
+          </select>
+          <div id="judgeQuizReviewBox" class="list"></div>
+        </article>
+
+        <article class="card">
+          <h3>Round 1 Verdict</h3>
+          <label for="judgeQuizVerdictTeamSelect">Choose Team</label>
+          <select id="judgeQuizVerdictTeamSelect">
+            <option value="">Select Team</option>
+          </select>
+
+          <label for="judgeQuizVerdictSelect">Verdict</label>
+          <select id="judgeQuizVerdictSelect">
+            <option value="Approved">Approved</option>
+            <option value="Needs Review">Needs Review</option>
+            <option value="Flagged">Flagged</option>
+            <option value="Disqualified">Disqualified</option>
+          </select>
+
+          <label for="judgeQuizNameInput">Judge Name</label>
+          <input class="input" id="judgeQuizNameInput" placeholder="Judge name" />
+
+          <label for="judgeQuizCommentsInput">Comments</label>
+          <textarea id="judgeQuizCommentsInput" placeholder="Reasoning, fairness note, tie-break logic, or remarks..."></textarea>
+
+          <div class="cta-row" style="justify-content:flex-start;margin-top:10px;">
+            <button class="btn primary" id="saveJudgeQuizVerdictBtn" type="button">Save Round 1 Verdict</button>
+          </div>
+          <p id="judgeQuizVerdictStatus" class="status"></p>
+          <div class="panel-divider"></div>
+          <h3>Saved Round 1 Verdicts</h3>
+          <div id="judgeQuizVerdictList" class="list"></div>
+        </article>
+      </section>
+
+      <section class="section reveal">
+        <article class="card">
+          <h3>Round 2 Coding Review</h3>
+          <label for="judgeCodingTeamSelect">Choose Team</label>
+          <select id="judgeCodingTeamSelect">
+            <option value="all">All Teams</option>
+          </select>
+          <div id="judgeCodingReviewBox" class="list"></div>
+        </article>
+
+        <article class="card">
+          <h3>Round 2 Verdict</h3>
+          <label for="judgeCodingVerdictTeamSelect">Choose Team</label>
+          <select id="judgeCodingVerdictTeamSelect">
+            <option value="">Select Team</option>
+          </select>
+
+          <label for="judgeCodingVerdictSelect">Verdict</label>
+          <select id="judgeCodingVerdictSelect">
+            <option value="Approved">Approved</option>
+            <option value="Needs Review">Needs Review</option>
+            <option value="Flagged">Flagged</option>
+            <option value="Disqualified">Disqualified</option>
+          </select>
+
+          <label for="judgeCodingNameInput">Judge Name</label>
+          <input class="input" id="judgeCodingNameInput" placeholder="Judge name" />
+
+          <label for="judgeCodingCommentsInput">Comments</label>
+          <textarea id="judgeCodingCommentsInput" placeholder="Code quality note, suspicious behavior, or remarks..."></textarea>
+
+          <div class="cta-row" style="justify-content:flex-start;margin-top:10px;">
+            <button class="btn primary" id="saveJudgeCodingVerdictBtn" type="button">Save Round 2 Verdict</button>
+          </div>
+          <p id="judgeCodingVerdictStatus" class="status"></p>
+          <div class="panel-divider"></div>
+          <h3>Saved Round 2 Verdicts</h3>
+          <div id="judgeCodingVerdictList" class="list"></div>
+        </article>
+      </section>
+    </section>
+  </main>
+
+  <script src="/scripts/theme.js"></script>
+  <script src="/scripts/judges-dashboard.js"></script>
+</body>
+</html>
