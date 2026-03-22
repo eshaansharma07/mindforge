@@ -10,6 +10,10 @@ const handlers = {
   "/api/candidate-login": require("../api/candidate-login"),
   "/api/candidate-logout": require("../api/candidate-logout"),
   "/api/candidate-state": require("../api/candidate-state"),
+  "/api/coding-login": require("../api/coding-login"),
+  "/api/coding-state": require("../api/coding-state"),
+  "/api/coding-submit": require("../api/coding-submit"),
+  "/api/coding-overview": require("../api/coding-overview"),
   "/api/submit-answer": require("../api/submit-answer"),
   "/api/admin-action": require("../api/admin-action"),
   "/api/admin-overview": require("../api/admin-overview")

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Round 2 Coding Controller | Mind Forge 2026</title>
+  <script>
+    document.documentElement.dataset.theme = localStorage.getItem("mindforge_theme") || "dark";
+  </script>
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <div class="grid-glow"></div>
+  <main class="page">
+    <nav class="nav reveal">
+      <div class="brand">
+        <span class="quick-brand">MIND FORGE</span>
+      </div>
+      <div class="nav-actions">
+        <div class="nav-links">
+          <a href="/index.html">Home</a>
+          <a href="/controller-dashboard.html">Round 1 Controller</a>
+          <a href="/coding-controller.html">Round 2 Coding</a>
+          <a href="/coding-round.html">Candidate Coding Portal</a>
+        </div>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">Light Mode</button>
+      </div>
+    </nav>
+
+    <section class="content">
+      <header class="section-title reveal">
+        <h2>Round 2 Coding Controller</h2>
+        <div class="divider"></div>
+        <p>Publish the coding problem, load testcase answers, review code/output submissions, score by testcase, and publish the coding leaderboard.</p>
+      </header>
+
+      <section class="section reveal">
+        <article class="card">
+          <h3>Round Overview</h3>
+          <div class="count-row" style="gap:22px;justify-content:flex-start;">
+            <div class="time-block"><div id="codingActiveState" class="time-num" style="font-size:2.2rem;">No</div><div class="time-label">Round Active</div></div>
+            <div class="time-block"><div id="codingSubmissionCount" class="time-num" style="font-size:2.2rem;">0</div><div class="time-label">Submissions</div></div>
+            <div class="time-block"><div id="codingLeaderboardCount" class="time-num" style="font-size:2.2rem;">0</div><div class="time-label">Leaderboard Rows</div></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Controller Session</h3>
+          <p class="muted">The same controller key protects this coding console.</p>
+          <div class="cta-row" style="justify-content:flex-start;margin-top:14px;">
+            <button class="btn" id="codingControllerLogoutBtn" type="button">Exit Controller</button>
+          </div>
+          <p id="codingControllerStatus" class="status"></p>
+        </article>
+      </section>
+
+      <section class="section reveal">
+        <article class="card">
+          <h3>Publish Coding Problem</h3>
+          <form id="codingRoundForm">
+            <label>Problem Title</label>
+            <input class="input" name="title" required />
+
+            <label>Subtitle</label>
+            <input class="input" name="subtitle" placeholder="Round 2 | Sudden Coding" />
+
+            <label>Instructions</label>
+            <textarea name="instructions" placeholder="Mention tab-switch rule, one-device rule, or any judging notes."></textarea>
+
+            <label>Problem Statement</label>
+            <textarea name="problemStatement" required></textarea>
+
+            <label>Constraints</label>
+            <textarea name="constraints" placeholder="Use line breaks for each constraint."></textarea>
+
+            <label>Input Format</label>
+            <textarea name="inputFormat"></textarea>
+
+            <label>Output Format</label>
+            <textarea name="outputFormat"></textarea>
+
+            <label>Sample Input</label>
+            <textarea name="sampleInput"></textarea>
+
+            <label>Sample Output</label>
+            <textarea name="sampleOutput"></textarea>
+
+            <label>Duration (Seconds)</label>
+            <input class="input" type="number" min="60" value="1800" name="durationSec" required />
+
+            <label>Test Cases</label>
+            <textarea name="testCasesText" placeholder="Case 1 || 5\n1 2 3 4 5 || 15 || 20&#10;Case 2 || 3\n10 20 30 || 60 || 20"></textarea>
+            <p class="muted">Use one testcase per line: Label || Input || Expected Output || Points. Use \n inside a field for line breaks.</p>
+
+            <div class="cta-row" style="justify-content:flex-start;margin-top:10px;">
+              <button class="btn primary" type="submit">Publish Coding Problem</button>
+              <button class="btn" id="closeCodingRoundBtn" type="button">Close Coding Round</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="card">
+          <h3>Current Coding Problem</h3>
+          <div id="codingRoundSummary" class="list"></div>
+        </article>
+      </section>
+
+      <section class="section reveal">
+        <article class="card">
+          <h3>Computed Coding Leaderboard</h3>
+          <div id="codingLeaderboardTable" class="list"></div>
+          <div class="panel-divider"></div>
+          <h3>Candidate Portal Coding Leaderboard</h3>
+          <p class="muted">Publish the computed coding leaderboard, edit it if needed, or hide/reset it.</p>
+          <textarea id="codingLeaderboardEditor" placeholder="TEAM ID || TEAM NAME || POINTS || CORRECT || TOTAL_CASES || TIME_SECONDS"></textarea>
+          <div class="cta-row" style="justify-content:flex-start;margin-top:10px;">
+            <button class="btn primary" id="showCodingLeaderboardBtn" type="button">Show Coding Leaderboard</button>
+            <button class="btn" id="saveCodingLeaderboardBtn" type="button">Save Edits</button>
+            <button class="btn" id="hideCodingLeaderboardBtn" type="button">Hide Coding Leaderboard</button>
+            <button class="btn" id="resetCodingLeaderboardBtn" type="button">Reset Coding Leaderboard</button>
+          </div>
+          <p id="codingLeaderboardStatus" class="status"></p>
+        </article>
+
+        <article class="card">
+          <h3>Submission Review</h3>
+          <div id="codingSubmissionReview" class="list"></div>
+        </article>
+      </section>
+
+      <footer class="footer reveal">
+        <div>
+          <div class="muted">Round 2 Coding Controller | Mind Forge 2026</div>
+          <div class="muted">Controllers can publish, score, and review coding submissions here.</div>
+        </div>
+        <div class="footer-logos">
+          <img
+            class="footer-logo ai-footer-logo theme-ai-logo"
+            src="/assets/ai-alliance-cropped.svg"
+            data-logo-dark="/assets/ai-alliance-cropped.svg"
+            data-logo-light="/assets/ai-alliance-light.svg"
+            alt="AI Alliance Logo"
+          />
+          <img class="footer-logo cu-footer-logo" src="https://www.cuchd.in/about/assets/images/cu-logo.png" alt="Chandigarh University Logo" />
+          <img class="footer-logo" src="/assets/unstop-logo.svg" alt="Unstop Logo" />
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <script src="/scripts/theme.js"></script>
+  <script src="/scripts/coding-controller.js"></script>
+</body>
+</html>

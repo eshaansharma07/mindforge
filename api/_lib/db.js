@@ -30,10 +30,14 @@ async function getDb() {
     indexesPromise = Promise.all([
       db.collection("teams").createIndex({ teamId: 1 }, { unique: true }),
       db.collection("candidate_sessions").createIndex({ teamId: 1 }, { unique: true }),
+      db.collection("coding_sessions").createIndex({ teamId: 1 }, { unique: true }),
       db.collection("quiz_responses").createIndex({ setId: 1, teamId: 1 }, { unique: true }),
+      db.collection("coding_submissions").createIndex({ roundId: 1, teamId: 1 }, { unique: true }),
       db.collection("quiz_sets").createIndex({ isActive: 1, endAt: 1 }),
+      db.collection("coding_rounds").createIndex({ isActive: 1, endAt: 1 }),
       db.collection("announcements").createIndex({ createdAt: -1 }),
-      db.collection("leaderboard_state").createIndex({ key: 1 }, { unique: true })
+      db.collection("leaderboard_state").createIndex({ key: 1 }, { unique: true }),
+      db.collection("coding_leaderboard_state").createIndex({ key: 1 }, { unique: true })
     ]).catch((error) => {
       indexesPromise = null;
       throw error;

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Candidate Dashboard | Mind Forge 2026</title>
+  <title>Round 2 Coding | Mind Forge 2026</title>
   <script>
     document.documentElement.dataset.theme = localStorage.getItem("mindforge_theme") || "dark";
   </script>
@@ -19,9 +19,7 @@
       <div class="nav-actions">
         <div class="nav-links">
           <a href="/index.html">Home</a>
-          <a href="/index.html#events">Events</a>
-          <a href="/index.html#rules">Rules</a>
-          <a href="/candidate.html">Portal</a>
+          <a href="/candidate.html">Round 1 Portal</a>
           <a href="/coding-round.html">Round 2 Coding</a>
           <a href="/admin.html">Controller</a>
         </div>
@@ -31,65 +29,65 @@
 
     <section class="content">
       <header class="section-title reveal">
-        <h2>Candidate Portal</h2>
+        <h2>Sudden Coding</h2>
         <div class="divider"></div>
-        <p>One question set contains multiple questions. You get 60 seconds total to submit all answers.</p>
+        <p>Round 2 coding portal. Teams solve one coding problem, submit code plus testcase outputs, and get scored testcase by testcase.</p>
       </header>
 
       <section class="section reveal">
         <article class="register-wrap">
-          <h3>Team Login</h3>
-          <form id="candidateLoginForm">
+          <h3>Round 2 Team Login</h3>
+          <form id="codingLoginForm">
             <label>Team ID *</label>
             <input class="input" name="teamId" placeholder="MF-XXXXXXXX" required />
 
             <label>Registered Email *</label>
             <input class="input" name="email" type="email" required />
 
-            <button class="btn primary" type="submit">Open Dashboard</button>
-            <button class="btn" id="logoutBtn" type="button">Logout Team</button>
-            <p id="loginStatus" class="status"></p>
+            <button class="btn primary" type="submit">Open Coding Round</button>
+            <button class="btn" id="codingLogoutBtn" type="button">Logout Team</button>
+            <p id="codingLoginStatus" class="status"></p>
           </form>
         </article>
 
         <article class="card">
-          <h3>Live Round Timer</h3>
-          <p class="muted">Submit answers for all displayed questions before timer ends.</p>
-          <div class="countdown" id="countdown">--</div>
+          <h3>Round 2 Timer</h3>
+          <p class="muted">Leaving the tab auto-submits whatever the team has filled so far.</p>
+          <div class="countdown" id="codingCountdown">--</div>
         </article>
       </section>
 
       <section class="section reveal">
         <article class="card">
           <h3>Team Details</h3>
-          <div id="teamBox" class="list"></div>
+          <div id="codingTeamBox" class="list"></div>
         </article>
 
         <article class="card">
           <h3>Announcements</h3>
-          <div id="announcementBox" class="list"></div>
+          <div id="codingAnnouncementBox" class="list"></div>
         </article>
       </section>
 
       <section class="card reveal">
-        <h3>Leaderboard</h3>
-        <div id="leaderboardPublicBox" class="list"></div>
+        <h3>Coding Leaderboard</h3>
+        <div id="codingLeaderboardBox" class="list"></div>
       </section>
 
       <section class="card reveal">
-        <h3>Current Question Set</h3>
-        <div id="questionText" class="item muted">No active question set yet.</div>
-        <div id="optionsBox" class="options"></div>
+        <h3>Live Coding Problem</h3>
+        <div id="codingProblemHeader" class="item muted">No active coding round yet.</div>
+        <div id="codingProblemBody" class="coding-problem-shell"></div>
         <div class="cta-row" style="justify-content:flex-start;margin-top:12px;">
-          <button class="btn primary" id="submitSetBtn" type="button" style="display:none;">Submit All Answers</button>
+          <button class="btn primary" id="codingSubmitBtn" type="button" style="display:none;">Submit Coding Round</button>
         </div>
-        <p id="answerStatus" class="status"></p>
+        <p id="codingAnswerStatus" class="status"></p>
       </section>
 
       <footer class="footer reveal">
         <div>
-          <div class="muted">Candidate Dashboard | Mind Forge 2026</div>
-          <div class="muted">Powered by Unstop</div>
+          <div class="muted">Round 2 Coding Portal | Mind Forge 2026</div>
+          <div class="muted">One active device per team. Tab switch triggers auto-submit.</div>
         </div>
         <div class="footer-logos">
           <img
@@ -107,6 +105,6 @@
   </main>
 
   <script src="/scripts/theme.js"></script>
-  <script src="/scripts/candidate.js"></script>
+  <script src="/scripts/coding-round.js"></script>
 </body>
 </html>
