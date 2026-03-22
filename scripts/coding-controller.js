@@ -8,6 +8,7 @@ const leaderboardCount = document.getElementById("codingLeaderboardCount");
 const roundSummary = document.getElementById("codingRoundSummary");
 const leaderboardTable = document.getElementById("codingLeaderboardTable");
 const submissionReview = document.getElementById("codingSubmissionReview");
+const submissionFilter = document.getElementById("codingSubmissionFilter");
 const leaderboardEditor = document.getElementById("codingLeaderboardEditor");
 const leaderboardStatus = document.getElementById("codingLeaderboardStatus");
 const showLeaderboardBtn = document.getElementById("showCodingLeaderboardBtn");
@@ -19,6 +20,7 @@ let adminKey = sessionStorage.getItem("mindforge_admin_key") || "";
 let sourceRoundId = null;
 let latestComputedLeaderboard = [];
 let leaderboardEditorDirty = false;
+let selectedSubmissionTeamId = "all";
 let overviewRequestInFlight = false;
 let overviewPollTimeout = null;
 
@@ -104,6 +106,24 @@ function renderRows(container, rows, empty = "No data") {
     item.innerHTML = html;
     container.appendChild(item);
   });
+}
+
+function syncSubmissionFilter(submissions) {
+  if (!submissionFilter) return;
+
+  const previousValue = selectedSubmissionTeamId || submissionFilter.value || "all";
+  const options = [
+    `<option value="all">All Submissions</option>`,
+    ...(submissions || []).map(
+      (submission) =>
+        `<option value="${escapeHtml(submission.teamId)}">${escapeHtml(submission.teamName || submission.teamId)} (${escapeHtml(submission.teamId)})</option>`
+    )
+  ];
+
+  submissionFilter.innerHTML = options.join("");
+  const hasPrevious = previousValue === "all" || (submissions || []).some((submission) => submission.teamId === previousValue);
+  selectedSubmissionTeamId = hasPrevious ? previousValue : "all";
+  submissionFilter.value = selectedSubmissionTeamId;
 }
 
 function decodeField(value) {
@@ -283,9 +303,16 @@ async function refreshOverview() {
       data.leaderboardState?.isVisible ? "ok" : ""
     );
 
+    const allSubmissions = data.submissions || [];
+    syncSubmissionFilter(allSubmissions);
+    const visibleSubmissions =
+      selectedSubmissionTeamId === "all"
+        ? allSubmissions
+        : allSubmissions.filter((submission) => submission.teamId === selectedSubmissionTeamId);
+
     renderRows(
       submissionReview,
-        (data.submissions || []).map((submission) => {
+        visibleSubmissions.map((submission) => {
           const cases = (submission.evaluatedCases || [])
           .map(
             (item) =>
@@ -295,7 +322,7 @@ async function refreshOverview() {
 
         return `<strong>${escapeHtml(submission.teamName || submission.teamId)}</strong> (${escapeHtml(submission.teamId)})<br/>Points: ${submission.totalPoints} | Correct: ${submission.correctCount}/${submission.totalCases} | Time: ${Math.round(submission.elapsedMs / 1000)}s | Mode: ${escapeHtml(submission.submissionMode)}<br/><div class="panel-divider"></div><span class="muted">Code</span><pre class="code-preview">${escapeHtml(submission.code || "No code submitted.")}</pre><div class="panel-divider"></div>${cases}<br/><button class="btn" type="button" data-reset-coding="${submission.teamId}" style="margin-top:8px;">Allow Retry</button>`;
       }),
-      "No coding submissions yet."
+      selectedSubmissionTeamId === "all" ? "No coding submissions yet." : "No submission found for the selected team."
     );
 
     submissionReview.querySelectorAll("[data-reset-coding]").forEach((button) => {
@@ -372,6 +399,11 @@ logoutBtn?.addEventListener("click", () => {
 
 leaderboardEditor?.addEventListener("input", () => {
   leaderboardEditorDirty = true;
+});
+
+submissionFilter?.addEventListener("change", () => {
+  selectedSubmissionTeamId = submissionFilter.value || "all";
+  refreshOverview();
 });
 
 showLeaderboardBtn?.addEventListener("click", () => updateCodingLeaderboard("show"));
