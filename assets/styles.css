@@ -829,6 +829,50 @@ body::before {
   font-size: 1.05rem;
 }
 
+.rule-list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: #bcc5db;
+  line-height: 1.45;
+  font-size: 1rem;
+}
+
+.rule-list li + li {
+  margin-top: 7px;
+}
+
+.rules-summary-card {
+  margin-top: 18px;
+}
+
+.rules-summary-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1.5fr 0.7fr;
+  gap: 1px;
+  border: 1px solid rgba(84, 140, 230, 0.28);
+  background: rgba(84, 140, 230, 0.16);
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.rules-summary-head,
+.rules-summary-cell {
+  padding: 14px 16px;
+  background: rgba(5, 10, 30, 0.88);
+}
+
+.rules-summary-head {
+  color: var(--cyan);
+  font-family: "Orbitron", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.82rem;
+}
+
+.rules-summary-cell {
+  color: var(--text);
+}
+
 .contact-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1599,6 +1643,14 @@ html[data-theme="light"] .footer {
   .coding-round-layout,
   .coding-block-grid {
     grid-template-columns: 1fr;
+  }
+
+  .rules-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rules-summary-head {
+    display: none;
   }
 }
 
