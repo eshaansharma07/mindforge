@@ -15,7 +15,6 @@ let activeSessionToken = localStorage.getItem("mindforge_coding_session_token") 
 let activeRoundId = null;
 let renderedRoundId = null;
 let timer;
-let autoSubmitting = false;
 let stateRequestInFlight = false;
 let pollTimeout = null;
 let codeDraft = "";
@@ -166,7 +165,7 @@ function renderRound(round) {
       <p class="muted">${round.subtitle || "Round 2 | Sudden Coding"}</p>
       <div class="coding-block">
       <div class="coding-block-label">Instructions</div>
-        <pre class="code-preview">${escapeHtml(round.instructions || "Solve the problem, fill testcase outputs, and submit before time ends. Tab switch auto-submits the round.")}</pre>
+        <pre class="code-preview">${escapeHtml(round.instructions || "Solve the problem, fill testcase outputs, and submit before time ends.")}</pre>
       </div>
       <div class="coding-block">
         <div class="coding-block-label">Statement</div>
@@ -437,18 +436,3 @@ if (activeTeamId && activeSessionToken) {
 } else if (activeTeamId || activeSessionToken) {
   clearAccess();
 }
-
-document.addEventListener("visibilitychange", () => {
-  if (
-    document.hidden &&
-    activeRoundId &&
-    activeSessionToken &&
-    submitBtn?.style.display !== "none" &&
-    !autoSubmitting
-  ) {
-    autoSubmitting = true;
-    submitCodingRound({ force: true, auto: true }).finally(() => {
-      autoSubmitting = false;
-    });
-  }
-});
