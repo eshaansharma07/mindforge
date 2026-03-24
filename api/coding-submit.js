@@ -8,6 +8,7 @@ module.exports = async (req, res) => {
   if (req.method !== "POST") return methodNotAllowed(res);
 
   try {
+    const TIMER_END_GRACE_MS = 15 * 1000;
     const data = readBody(req);
     const teamId = String(data.teamId || "").trim().toUpperCase();
     const roundId = String(data.roundId || "").trim();
@@ -31,11 +32,7 @@ module.exports = async (req, res) => {
 
     const [team, round] = await Promise.all([
       db.collection("teams").findOne({ teamId }),
-      db.collection("coding_rounds").findOne({
-        roundId,
-        isActive: true,
-        endAt: { $gt: new Date() }
-      })
+      db.collection("coding_rounds").findOne({ roundId })
     ]);
 
     if (!team) {
@@ -43,12 +40,24 @@ module.exports = async (req, res) => {
     }
 
     if (!round) {
-      return send(res, 400, { success: false, message: "Coding round not active." });
+      return send(res, 400, { success: false, message: "Coding round not found." });
     }
 
     const now = Date.now();
+    const endAt = new Date(round.endAt).getTime();
     const startAt = new Date(round.startAt).getTime();
-    const elapsedMs = Math.max(0, now - startAt);
+    const isTimerEndSubmission = submissionMode === "timer_end";
+    const withinGraceWindow = now <= endAt + TIMER_END_GRACE_MS;
+
+    if (!round.isActive && !(isTimerEndSubmission && withinGraceWindow)) {
+      return send(res, 400, { success: false, message: "Coding round not active." });
+    }
+
+    if (now > endAt && !(isTimerEndSubmission && withinGraceWindow)) {
+      return send(res, 400, { success: false, message: "Time is up for this coding round." });
+    }
+
+    const elapsedMs = Math.max(0, Math.min(now, endAt) - startAt);
     const scored = scoreCodingSubmission(round, answers);
 
     await db.collection("coding_submissions").insertOne({

@@ -15,6 +15,7 @@ let activeSessionToken = localStorage.getItem("mindforge_coding_session_token") 
 let activeRoundId = null;
 let renderedRoundId = null;
 let timer;
+let autoSubmitting = false;
 let stateRequestInFlight = false;
 let pollTimeout = null;
 let codeDraft = "";
@@ -133,6 +134,12 @@ function startCountdown(endAt) {
       clearInterval(timer);
       countdownEl.textContent = "0s";
       submitBtn.style.display = "none";
+      if (activeRoundId && activeSessionToken && !autoSubmitting) {
+        autoSubmitting = true;
+        submitCodingRound({ force: true, auto: true, reason: "timer_end" }).finally(() => {
+          autoSubmitting = false;
+        });
+      }
     }
   };
 
@@ -222,7 +229,7 @@ function renderRound(round) {
   attachEditorState();
 }
 
-async function submitCodingRound({ force = false, auto = false } = {}) {
+async function submitCodingRound({ force = false, auto = false, reason = "" } = {}) {
   if (!activeTeamId || !activeRoundId || !activeSessionToken) return;
 
   const answers = Object.entries(caseAnswers).map(([caseId, output]) => ({ caseId, output }));
@@ -242,7 +249,7 @@ async function submitCodingRound({ force = false, auto = false } = {}) {
         code: codeDraft,
         answers,
         sessionToken: activeSessionToken,
-        submissionMode: auto ? "tab_switch" : "manual"
+        submissionMode: reason || (auto ? "tab_switch" : "manual")
       })
     });
 
@@ -305,6 +312,16 @@ async function loadState() {
 
     const round = result.activeRound;
     if (!round) {
+      if (activeRoundId && activeSessionToken && !result.hasSubmitted && !autoSubmitting) {
+        autoSubmitting = true;
+        try {
+          await submitCodingRound({ force: true, auto: true, reason: "timer_end" });
+          queueNextLoad(false, false);
+          return;
+        } finally {
+          autoSubmitting = false;
+        }
+      }
       activeRoundId = null;
       renderedRoundId = null;
       codeDraft = "";

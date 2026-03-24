@@ -159,6 +159,12 @@ function startCountdown(endAt) {
       clearInterval(timer);
       countdownEl.textContent = "0s";
       submitSetBtn.style.display = "none";
+      if (activeSetId && activeSessionToken && !autoSubmitting) {
+        autoSubmitting = true;
+        submitAllAnswers({ force: true, auto: true, reason: "timer_end" }).finally(() => {
+          autoSubmitting = false;
+        });
+      }
     }
   };
 
@@ -213,7 +219,7 @@ function renderQuestionSet(set) {
   });
 }
 
-async function submitAllAnswers({ force = false, auto = false } = {}) {
+async function submitAllAnswers({ force = false, auto = false, reason = "" } = {}) {
   if (!activeTeamId || !activeSetId || !activeSessionToken) return;
 
   const answers = Object.entries(selectedAnswers).map(([questionId, selectedIndex]) => ({
@@ -236,7 +242,7 @@ async function submitAllAnswers({ force = false, auto = false } = {}) {
         setId: activeSetId,
         answers,
         sessionToken: activeSessionToken,
-        submissionMode: auto ? "tab_switch" : "manual"
+        submissionMode: reason || (auto ? "tab_switch" : "manual")
       })
     });
 
@@ -309,6 +315,16 @@ async function loadState() {
 
     const set = result.activeSet;
     if (!set) {
+      if (activeSetId && activeSessionToken && !result.hasSubmitted && !autoSubmitting) {
+        autoSubmitting = true;
+        try {
+          await submitAllAnswers({ force: true, auto: true, reason: "timer_end" });
+          queueNextLoad(false, false);
+          return;
+        } finally {
+          autoSubmitting = false;
+        }
+      }
       activeSetId = null;
       renderedSetId = null;
       selectedAnswers = {};
@@ -450,7 +466,7 @@ document.addEventListener("visibilitychange", () => {
     !autoSubmitting
   ) {
     autoSubmitting = true;
-    submitAllAnswers({ force: true, auto: true }).finally(() => {
+    submitAllAnswers({ force: true, auto: true, reason: "tab_switch" }).finally(() => {
       autoSubmitting = false;
     });
   }

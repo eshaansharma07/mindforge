@@ -7,6 +7,7 @@ module.exports = async (req, res) => {
   if (req.method !== "POST") return methodNotAllowed(res);
 
   try {
+    const TIMER_END_GRACE_MS = 15 * 1000;
     const data = readBody(req);
     const teamId = String(data.teamId || "").trim().toUpperCase();
     const setId = String(data.setId || "").trim();
@@ -29,11 +30,7 @@ module.exports = async (req, res) => {
 
     const [team, set] = await Promise.all([
       db.collection("teams").findOne({ teamId }),
-      db.collection("quiz_sets").findOne({
-        setId,
-        isActive: true,
-        endAt: { $gt: new Date() }
-      })
+      db.collection("quiz_sets").findOne({ setId })
     ]);
 
     if (!team) {
@@ -41,14 +38,20 @@ module.exports = async (req, res) => {
     }
 
     if (!set) {
-      return send(res, 400, { success: false, message: "Question set not active." });
+      return send(res, 400, { success: false, message: "Question set not found." });
     }
 
     const now = Date.now();
     const endAt = new Date(set.endAt).getTime();
     const startAt = new Date(set.startAt).getTime();
+    const isTimerEndSubmission = submissionMode === "timer_end";
+    const withinGraceWindow = now <= endAt + TIMER_END_GRACE_MS;
 
-    if (now > endAt) {
+    if (!set.isActive && !(isTimerEndSubmission && withinGraceWindow)) {
+      return send(res, 400, { success: false, message: "Question set not active." });
+    }
+
+    if (now > endAt && !(isTimerEndSubmission && withinGraceWindow)) {
       return send(res, 400, { success: false, message: "Time is up for this round." });
     }
 
@@ -81,7 +84,7 @@ module.exports = async (req, res) => {
     const correctCount = evaluatedAnswers.filter((a) => a.isCorrect).length;
     const pointsPerCorrect = Number(set.pointsPerCorrect || 10);
     const points = correctCount * pointsPerCorrect;
-    const elapsedMs = Math.max(0, now - startAt);
+    const elapsedMs = Math.max(0, Math.min(now, endAt) - startAt);
 
     await db.collection("quiz_responses").insertOne({
       setId,
