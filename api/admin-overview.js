@@ -106,8 +106,7 @@ module.exports = async (req, res) => {
                   answers: 1,
                   teamName: { $arrayElemAt: ["$team.teamName", 0] }
                 }
-              },
-              { $limit: 20 }
+              }
             ])
             .toArray(),
           db.collection("judge_verdicts")
