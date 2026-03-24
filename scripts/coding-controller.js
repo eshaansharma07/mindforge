@@ -362,9 +362,11 @@ async function refreshOverview() {
     );
 
     const publicEntries =
-      Array.isArray(data.leaderboardState?.entries) && data.leaderboardState.entries.length > 0
-        ? data.leaderboardState.entries
-        : latestComputedLeaderboard;
+      Array.isArray(latestComputedLeaderboard) && latestComputedLeaderboard.length > 0
+        ? latestComputedLeaderboard
+        : Array.isArray(data.leaderboardState?.entries)
+          ? data.leaderboardState.entries
+          : [];
 
     if (leaderboardEditor && document.activeElement !== leaderboardEditor && !leaderboardEditorDirty) {
       leaderboardEditor.value = serializeCodingLeaderboardEntries(publicEntries);
